@@ -1,4 +1,4 @@
 repos/
-*.log
-.DS_Store
-Thumbs.db
+.agents/
+.claude/
+.codex/
