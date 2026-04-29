@@ -1,14 +1,8 @@
-Graphify 필수 설치(첫 적용 시)
+# AI Skill Toolkit
 
-powershell
- uv tool install graphifyy
+Reusable AI development skill system for Codex / Claude / Antigravity.
 
- cd "프로젝트 경로"(따옴표 필수)
+## Usage
 
- graphify codex install
- graphify claude install
- graphify antigravity install
-
-
-codex
- $graphify .
+```powershell
+powershell -ExecutionPolicy Bypass -File "scripts/install-to-project.ps1" -ProjectPath "YOUR_PROJECT_PATH"
