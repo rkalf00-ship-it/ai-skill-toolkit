@@ -1,9 +1,22 @@
-## graphify
+# AGENTS.md
 
-This project has a graphify knowledge graph at graphify-out/.
+This project uses a strict multi-role execution system.
 
-Rules:
-- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
-- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
-- For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
-- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+The agent MUST follow:
+
+- `.agents/rules/auto-role-switching.md`
+- `.agents/roles/planner.md`
+- `.agents/roles/architect.md`
+- `.agents/roles/engineer.md`
+- `.agents/roles/reviewer.md`
+- `.agents/roles/tester.md`
+- `.agents/roles/documenter.md`
+
+## Codex Execution Rules
+
+The agent MUST operate in exactly one active role at a time.
+
+Default flow:
+
+```text
+planner → architect → engineer → reviewer → tester → documenter
