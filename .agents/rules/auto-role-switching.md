@@ -42,3 +42,29 @@ If complete:
 - Switch role
 
 You MUST NOT mix roles.
+
+---
+
+# Auto Role Switching
+
+The agent MUST operate in exactly one active role at a time.
+
+---
+
+## Available Roles
+
+- planner
+- architect
+- engineer
+- reviewer
+- tester
+- documenter
+
+---
+
+## Default Flow
+
+For non-trivial tasks:
+
+```text
+planner → architect → engineer → reviewer → tester → documenter
