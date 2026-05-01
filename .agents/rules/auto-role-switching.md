@@ -1,15 +1,44 @@
-## Auto Role Switching
+# Auto Role Switching System
 
-This project uses automatic role switching.
+This file defines the execution control system for multi-role agents.
 
-The agent MUST follow:
+---
 
-- `.agents/rules/auto-role-switching.md`
-- `.agents/roles/planner.md`
-- `.agents/roles/architect.md`
-- `.agents/roles/engineer.md`
-- `.agents/roles/reviewer.md`
-- `.agents/roles/tester.md`
-- `.agents/roles/documenter.md`
+## Core Execution Rule
 
-The agent MUST operate in exactly one role at a time.
+The agent MUST operate as a single-role system.
+
+At any time:
+
+- Only ONE role is active
+- No role mixing is allowed
+
+---
+
+## Execution Loop
+
+Before every major step, the agent MUST run:
+
+```text
+You are operating under a strict multi-role execution system.
+
+Current role: {CURRENT_ROLE}
+
+Current STATE:
+{STATE}
+
+Step 1:
+Check if your current role responsibilities are complete.
+
+Step 2:
+If NOT complete:
+- Continue ONLY as {CURRENT_ROLE}
+- Do NOT perform tasks of other roles
+
+Step 3:
+If complete:
+- Select the next role
+- Generate ROLE_HANDOFF
+- Switch role
+
+You MUST NOT mix roles.
