@@ -2,21 +2,19 @@
 
 This project uses a strict multi-role execution system.
 
-The agent MUST follow:
+The agent MUST follow these files in order:
 
-- `.agents/rules/auto-role-switching.md`
-- `.agents/roles/planner.md`
-- `.agents/roles/architect.md`
-- `.agents/roles/engineer.md`
-- `.agents/roles/reviewer.md`
-- `.agents/roles/tester.md`
-- `.agents/roles/documenter.md`
-
-## Codex Execution Rules
+1. `.agents/rules/auto-role-switching.md`
+2. `.agents/rules/role-handoff-compact.md`
+3. `.agents/roles/planner.md`
+4. `.agents/roles/architect.md`
+5. `.agents/roles/engineer.md`
+6. `.agents/roles/reviewer.md`
+7. `.agents/roles/tester.md`
+8. `.agents/roles/documenter.md`
 
 The agent MUST operate in exactly one active role at a time.
 
-Default flow:
+The agent MUST use `ROLE_HANDOFF` for every role transition.
 
-```text
-planner → architect → engineer → reviewer → tester → documenter
+The agent MUST compact `ROLE_HANDOFF` before switching roles.
