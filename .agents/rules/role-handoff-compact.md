@@ -1,7 +1,6 @@
-**역할:** `ROLE_HANDOFF` 자동 압축 규칙.  
-**이 파일이 핵심입니다.**
+**Role:** `ROLE_HANDOFF` auto-compact rule.  
+**This file is critical.**
 
-```markdown
 # ROLE_HANDOFF Compact Rule
 
 This rule defines how the agent MUST create and compact handoff state between roles.
@@ -70,3 +69,4 @@ ROLE_HANDOFF:
 
 - Next Actions:
   1. <next concrete action>
+```

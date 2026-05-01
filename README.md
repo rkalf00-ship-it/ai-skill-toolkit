@@ -8,6 +8,29 @@ description: Behavioral guidelines to reduce common LLM coding mistakes. Use whe
 license: MIT
 ---
 
+## Governance Model
+
+This toolkit ships with two governance systems. Pick the right one for the task.
+
+### Default: Karpathy Guidelines (lightweight)
+
+For everyday work — bug fixes, small features, refactors, docs, code review — operate under the Karpathy Guidelines below. Bias toward simplicity, surgical changes, and explicit assumptions. No mandatory pipeline.
+
+### Opt-in: Multi-Role Pipeline (heavyweight)
+
+For complex work, switch to the strict 6-role pipeline (`planner → architect → engineer → reviewer → tester → documenter`) defined in `.agents/`. The pipeline is **only** activated when the user explicitly triggers it.
+
+**Trigger keywords (any of):**
+
+- `/multirole`
+- `full pipeline`
+- `정식 절차로`
+- `멀티롤로`
+
+Without these triggers the pipeline does not engage — even for non-trivial tasks. Karpathy Guidelines apply by default.
+
+**When to opt in:** net-new features touching multiple files, architecture changes, security-sensitive work, or anything the user explicitly wants run through formal review.
+
 # Karpathy Guidelines
 
 Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.

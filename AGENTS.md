@@ -1,8 +1,21 @@
 # AGENTS.md
 
-This project uses a strict multi-role execution system.
+This project uses two governance modes.
 
-The agent MUST follow these files in order:
+## Default: Karpathy Guidelines
+
+For everyday work the agent operates under `README.md` Karpathy Guidelines. No mandatory pipeline.
+
+## Opt-in: Multi-Role Pipeline
+
+The strict multi-role execution system activates **only** when the user triggers it explicitly via:
+
+- `/multirole`
+- `full pipeline`
+- `정식 절차로`
+- `멀티롤로`
+
+When triggered, the agent MUST follow these files in order:
 
 1. `.agents/rules/auto-role-switching.md`
 2. `.agents/rules/role-handoff-compact.md`
