@@ -34,3 +34,4 @@ For non-trivial tasks, Claude MUST follow:
 
 ```text
 planner → architect → engineer → reviewer → tester → documenter
+```
