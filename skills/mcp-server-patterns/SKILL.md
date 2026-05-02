@@ -1,6 +1,6 @@
 ---
 name: mcp-server-patterns
-description: Build MCP servers with Node/TypeScript SDK — tools, resources, prompts, Zod validation, stdio vs Streamable HTTP. Use Context7 or official MCP docs for latest API.
+description: Build MCP servers with Node/TypeScript SDK - tools, resources, prompts, Zod validation, stdio vs Streamable HTTP. Use Context7 or official MCP docs for latest API.
 origin: ECC
 ---
 
@@ -27,7 +27,7 @@ The Node/TypeScript SDK may expose `tool()` / `resource()` or `registerTool()` /
 
 ### Connecting with stdio
 
-For local clients, create a stdio transport and pass it to your server’s connect method. The exact API varies by SDK version (e.g. constructor vs factory). See the official MCP documentation or query Context7 for "MCP stdio server" for the current pattern.
+For local clients, create a stdio transport and pass it to your server's connect method. The exact API varies by SDK version (e.g. constructor vs factory). See the official MCP documentation or query Context7 for "MCP stdio server" for the current pattern.
 
 Keep server logic (tools + resources) independent of transport so you can plug in stdio or HTTP in the entrypoint.
 
@@ -50,9 +50,9 @@ import { z } from "zod";
 const server = new McpServer({ name: "my-server", version: "1.0.0" });
 ```
 
-Register tools and resources using the API your SDK version provides: some versions use `server.tool(name, description, schema, handler)` (positional args), others use `server.tool({ name, description, inputSchema }, handler)` or `registerTool()`. Same for resources — include a `uri` in the handler when the API provides it. Check the official MCP docs or Context7 for the current `@modelcontextprotocol/sdk` signatures to avoid copy-paste errors.
+Register tools and resources using the API your SDK version provides: some versions use `server.tool(name, description, schema, handler)` (positional args), others use `server.tool({ name, description, inputSchema }, handler)` or `registerTool()`. Same for resources - include a `uri` in the handler when the API provides it. Check the official MCP docs or Context7 for the current `@modelcontextprotocol/sdk` signatures to avoid copy-paste errors.
 
-Use **Zod** (or the SDK’s preferred schema format) for input validation.
+Use **Zod** (or the SDK's preferred schema format) for input validation.
 
 ## Best Practices
 

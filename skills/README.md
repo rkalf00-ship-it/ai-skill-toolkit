@@ -45,4 +45,7 @@ Run from this repository:
 .\scripts\install-to-project.ps1 -ProjectPath "D:\path\to\project"
 ```
 
-Use `-ForcePolicy` to overwrite an existing target `AGENTS.md`.
+Skills land in `.agents/skills` (single source); `.claude/skills` and `.codex/skills` are directory junctions to it.
+
+- `-ForcePolicy` - overwrite an existing target `AGENTS.md`, `CLAUDE.md`, or `.agents/AGENTS.md`.
+- `-ForceLinks` - replace a pre-existing non-empty `.claude/skills` or `.codex/skills` real directory with a junction.

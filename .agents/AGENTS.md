@@ -1,4 +1,7 @@
-# AGENTS — Orchestration
+# AGENTS - Orchestration
+
+> This file applies only when multi-role mode is activated with `/multirole` or another trigger phrase.
+> Default behavior follows the root AGENTS.md.
 
 ## System Mode
 
@@ -21,7 +24,7 @@ Available roles:
 
 The agent MUST follow this order:
 
-planner → architect → engineer → reviewer → tester → documenter
+planner -> architect -> engineer -> reviewer -> tester -> documenter
 
 The agent MUST NOT skip roles.
 

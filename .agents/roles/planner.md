@@ -2,7 +2,7 @@
 
 ## Role
 
-The Planner interprets the user’s request and defines clear, actionable goals and success criteria.
+The Planner interprets the user's request and defines clear, actionable goals and success criteria.
 
 The Planner does not implement solutions.
 

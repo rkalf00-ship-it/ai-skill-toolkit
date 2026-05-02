@@ -12,8 +12,8 @@ The strict multi-role execution system activates **only** when the user triggers
 
 - `/multirole`
 - `full pipeline`
-- `정식 절차로`
-- `멀티롤로`
+- `formal process`
+- `multi-role`
 
 When triggered, the agent MUST follow these files in order:
 

@@ -1,6 +1,6 @@
 ---
 name: repo-scan
-description: Cross-stack source code asset audit — classifies every file, detects embedded third-party libraries, and delivers actionable four-level verdicts per module with interactive HTML reports.
+description: Cross-stack source code asset audit - classifies every file, detects embedded third-party libraries, and delivers actionable four-level verdicts per module with interactive HTML reports.
 origin: community
 ---
 
@@ -11,7 +11,7 @@ origin: community
 ## When to Use
 
 - Taking over a large legacy codebase and need a structural overview
-- Before major refactoring — identify what's core, what's duplicate, what's dead
+- Before major refactoring - identify what's core, what's duplicate, what's dead
 - Auditing third-party dependencies embedded directly in source (not declared in package managers)
 - Preparing architecture decision records for monorepo reorganization
 
@@ -36,7 +36,7 @@ cp -r . ~/.claude/skills/repo-scan
 |---|---|
 | **Cross-stack scanning** | C/C++, Java/Android, iOS (OC/Swift), Web (TS/JS/Vue) in one pass |
 | **File classification** | Every file tagged as project code, third-party, or build artifact |
-| **Library detection** | 50+ known libraries (FFmpeg, Boost, OpenSSL…) with version extraction |
+| **Library detection** | 50+ known libraries (FFmpeg, Boost, OpenSSL...) with version extraction |
 | **Four-level verdicts** | Core Asset / Extract & Merge / Rebuild / Deprecate |
 | **HTML reports** | Interactive dark-theme pages with drill-down navigation |
 | **Monorepo support** | Hierarchical scanning with summary + sub-project reports |

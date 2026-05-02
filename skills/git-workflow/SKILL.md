@@ -25,10 +25,10 @@ Best for continuous deployment and small-to-medium teams.
 
 ```
 main (protected, always deployable)
-  │
-  ├── feature/user-auth      → PR → merge to main
-  ├── feature/payment-flow   → PR → merge to main
-  └── fix/login-bug          → PR → merge to main
+  |
+  |--- feature/user-auth      -> PR -> merge to main
+  |--- feature/payment-flow   -> PR -> merge to main
+  `--- fix/login-bug          -> PR -> merge to main
 ```
 
 **Rules:**
@@ -44,10 +44,10 @@ Best for teams with strong CI/CD and feature flags.
 
 ```
 main (trunk)
-  │
-  ├── short-lived feature (1-2 days max)
-  ├── short-lived feature
-  └── short-lived feature
+  |
+  |--- short-lived feature (1-2 days max)
+  |--- short-lived feature
+  `--- short-lived feature
 ```
 
 **Rules:**
@@ -62,15 +62,15 @@ Best for scheduled releases and enterprise projects.
 
 ```
 main (production releases)
-  │
-  └── develop (integration branch)
-        │
-        ├── feature/user-auth
-        ├── feature/payment
-        │
-        ├── release/1.0.0    → merge to main and develop
-        │
-        └── hotfix/critical  → merge to main and develop
+  |
+  `--- develop (integration branch)
+        |
+        |--- feature/user-auth
+        |--- feature/payment
+        |
+        |--- release/1.0.0    -> merge to main and develop
+        |
+        `--- hotfix/critical  -> merge to main and develop
 ```
 
 **Rules:**
@@ -416,9 +416,9 @@ MINOR: New features, backward compatible
 PATCH: Bug fixes, backward compatible
 
 Examples:
-1.0.0 → 1.0.1 (patch: bug fix)
-1.0.1 → 1.1.0 (minor: new feature)
-1.1.0 → 2.0.0 (major: breaking change)
+1.0.0 -> 1.0.1 (patch: bug fix)
+1.0.1 -> 1.1.0 (minor: new feature)
+1.1.0 -> 2.0.0 (major: breaking change)
 ```
 
 ### Creating Releases

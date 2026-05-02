@@ -12,21 +12,21 @@ Comprehensive Playwright patterns for building stable, fast, and maintainable E2
 
 ```
 tests/
-├── e2e/
-│   ├── auth/
-│   │   ├── login.spec.ts
-│   │   ├── logout.spec.ts
-│   │   └── register.spec.ts
-│   ├── features/
-│   │   ├── browse.spec.ts
-│   │   ├── search.spec.ts
-│   │   └── create.spec.ts
-│   └── api/
-│       └── endpoints.spec.ts
-├── fixtures/
-│   ├── auth.ts
-│   └── data.ts
-└── playwright.config.ts
+|--- e2e/
+|   |--- auth/
+|   |   |--- login.spec.ts
+|   |   |--- logout.spec.ts
+|   |   `--- register.spec.ts
+|   |--- features/
+|   |   |--- browse.spec.ts
+|   |   |--- search.spec.ts
+|   |   `--- create.spec.ts
+|   `--- api/
+|       `--- endpoints.spec.ts
+|--- fixtures/
+|   |--- auth.ts
+|   `--- data.ts
+`--- playwright.config.ts
 ```
 
 ## Page Object Model (POM)
@@ -303,7 +303,7 @@ test('wallet connection', async ({ page, context }) => {
 
 ```typescript
 test('trade execution', async ({ page }) => {
-  // Skip on production — real money
+  // Skip on production - real money
   test.skip(process.env.NODE_ENV === 'production', 'Skip on production')
 
   await page.goto('/markets/test-market')

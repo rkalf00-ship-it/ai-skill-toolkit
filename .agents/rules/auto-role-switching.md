@@ -67,4 +67,4 @@ The agent MUST operate in exactly one active role at a time.
 For non-trivial tasks:
 
 ```text
-planner → architect → engineer → reviewer → tester → documenter
+planner -> architect -> engineer -> reviewer -> tester -> documenter

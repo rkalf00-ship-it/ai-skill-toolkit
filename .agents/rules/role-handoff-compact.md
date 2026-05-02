@@ -1,4 +1,4 @@
-**Role:** `ROLE_HANDOFF` auto-compact rule.  
+**Role:** `ROLE_HANDOFF` auto-compact rule.
 **This file is critical.**
 
 # ROLE_HANDOFF Compact Rule

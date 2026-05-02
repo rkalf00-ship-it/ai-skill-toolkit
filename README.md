@@ -2,34 +2,14 @@
 
 Reusable AI development skill system for Codex / Claude / Antigravity.
 
----
-name: essential guidelines
-description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
-license: MIT
----
-
 ## Governance Model
 
-This toolkit ships with two governance systems. Pick the right one for the task.
+Two modes:
 
-### Default: Karpathy Guidelines (lightweight)
+- **Default** - [Karpathy Guidelines](#karpathy-guidelines) (lightweight). No mandatory pipeline.
+- **Opt-in** - Multi-Role Pipeline (`planner -> architect -> engineer -> reviewer -> tester -> documenter`). Activates only when explicitly triggered by one of: `/multirole`, `full pipeline`, `formal process`, `multi-role`.
 
-For everyday work — bug fixes, small features, refactors, docs, code review — operate under the Karpathy Guidelines below. Bias toward simplicity, surgical changes, and explicit assumptions. No mandatory pipeline.
-
-### Opt-in: Multi-Role Pipeline (heavyweight)
-
-For complex work, switch to the strict 6-role pipeline (`planner → architect → engineer → reviewer → tester → documenter`) defined in `.agents/`. The pipeline is **only** activated when the user explicitly triggers it.
-
-**Trigger keywords (any of):**
-
-- `/multirole`
-- `full pipeline`
-- `정식 절차로`
-- `멀티롤로`
-
-Without these triggers the pipeline does not engage — even for non-trivial tasks. Karpathy Guidelines apply by default.
-
-**When to opt in:** net-new features touching multiple files, architecture changes, security-sensitive work, or anything the user explicitly wants run through formal review.
+See [`AGENTS.md`](AGENTS.md) for full activation rules and pipeline file references.
 
 # Karpathy Guidelines
 
@@ -80,15 +60,15 @@ The test: Every changed line should trace directly to the user's request.
 **Define success criteria. Loop until verified.**
 
 Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
+- "Add validation" -> "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" -> "Write a test that reproduces it, then make it pass"
+- "Refactor X" -> "Ensure tests pass before and after"
 
 For multi-step tasks, state a brief plan:
 ```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+1. [Step] -> verify: [check]
+2. [Step] -> verify: [check]
+3. [Step] -> verify: [check]
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
@@ -99,3 +79,14 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ```powershell
 powershell -ExecutionPolicy Bypass -File "scripts/install-to-project.ps1" -ProjectPath "YOUR_PROJECT_PATH"
 ```
+
+Skills are copied once into `.agents/skills`. `.claude/skills` and `.codex/skills` are created as directory junctions pointing to that single source, so editing a skill in any of the three locations updates all of them.
+
+Optional switches:
+
+- `-ForcePolicy` - overwrite existing `AGENTS.md`, `CLAUDE.md`, and `.agents/AGENTS.md` in the target project (default: skip if present).
+- `-ForceLinks` - replace a non-empty `.claude/skills` or `.codex/skills` directory with a junction (default: error out to protect existing content). Existing junctions are always recreated without this switch.
+
+## License
+
+MIT - see [LICENSE](LICENSE).

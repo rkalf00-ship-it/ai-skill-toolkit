@@ -47,19 +47,19 @@ This Skill is not needed in the following situations:
 
 ## Rule Categories by Priority
 
-*For human/AI reference: follow priority 1→10 to decide which rule category to focus on first; use `--domain <Domain>` to query details when needed. Scripts do not read this table.*
+*For human/AI reference: follow priority 1->10 to decide which rule category to focus on first; use `--domain <Domain>` to query details when needed. Scripts do not read this table.*
 
 | Priority | Category | Impact | Domain | Key Checks (Must Have) | Anti-Patterns (Avoid) |
 |----------|----------|--------|--------|------------------------|------------------------|
 | 1 | Accessibility | CRITICAL | `ux` | Contrast 4.5:1, Alt text, Keyboard nav, Aria-labels | Removing focus rings, Icon-only buttons without labels |
-| 2 | Touch & Interaction | CRITICAL | `ux` | Min size 44×44px, 8px+ spacing, Loading feedback | Reliance on hover only, Instant state changes (0ms) |
+| 2 | Touch & Interaction | CRITICAL | `ux` | Min size 44x44px, 8px+ spacing, Loading feedback | Reliance on hover only, Instant state changes (0ms) |
 | 3 | Performance | HIGH | `ux` | WebP/AVIF, Lazy loading, Reserve space (CLS &lt; 0.1) | Layout thrashing, Cumulative Layout Shift |
 | 4 | Style Selection | HIGH | `style`, `product` | Match product type, Consistency, SVG icons (no emoji) | Mixing flat & skeuomorphic randomly, Emoji as icons |
 | 5 | Layout & Responsive | HIGH | `ux` | Mobile-first breakpoints, Viewport meta, No horizontal scroll | Horizontal scroll, Fixed px container widths, Disable zoom |
 | 6 | Typography & Color | MEDIUM | `typography`, `color` | Base 16px, Line-height 1.5, Semantic color tokens | Text &lt; 12px body, Gray-on-gray, Raw hex in components |
-| 7 | Animation | MEDIUM | `ux` | Duration 150–300ms, Motion conveys meaning, Spatial continuity | Decorative-only animation, Animating width/height, No reduced-motion |
+| 7 | Animation | MEDIUM | `ux` | Duration 150-300ms, Motion conveys meaning, Spatial continuity | Decorative-only animation, Animating width/height, No reduced-motion |
 | 8 | Forms & Feedback | MEDIUM | `ux` | Visible labels, Error near field, Helper text, Progressive disclosure | Placeholder-only label, Errors only at top, Overwhelm upfront |
-| 9 | Navigation Patterns | HIGH | `ux` | Predictable back, Bottom nav ≤5, Deep linking | Overloaded nav, Broken back behavior, No deep links |
+| 9 | Navigation Patterns | HIGH | `ux` | Predictable back, Bottom nav <=5, Deep linking | Overloaded nav, Broken back behavior, No deep links |
 | 10 | Charts & Data | LOW | `chart` | Legends, Tooltips, Accessible colors | Relying on color alone to convey meaning |
 
 ## Quick Reference
@@ -67,13 +67,13 @@ This Skill is not needed in the following situations:
 ### 1. Accessibility (CRITICAL)
 
 - `color-contrast` - Minimum 4.5:1 ratio for normal text (large text 3:1); Material Design
-- `focus-states` - Visible focus rings on interactive elements (2–4px; Apple HIG, MD)
+- `focus-states` - Visible focus rings on interactive elements (2-4px; Apple HIG, MD)
 - `alt-text` - Descriptive alt text for meaningful images
 - `aria-labels` - aria-label for icon-only buttons; accessibilityLabel in native (Apple HIG)
 - `keyboard-nav` - Tab order matches visual order; full keyboard support (Apple HIG)
 - `form-labels` - Use label with for attribute
 - `skip-links` - Skip to main content for keyboard users
-- `heading-hierarchy` - Sequential h1→h6, no level skip
+- `heading-hierarchy` - Sequential h1->h6, no level skip
 - `color-not-only` - Don't convey info by color alone (add icon/text)
 - `dynamic-type` - Support system text scaling; avoid truncation as text grows (Apple Dynamic Type, MD)
 - `reduced-motion` - Respect prefers-reduced-motion; reduce/disable animations when requested (Apple Reduced Motion API, MD)
@@ -83,7 +83,7 @@ This Skill is not needed in the following situations:
 
 ### 2. Touch & Interaction (CRITICAL)
 
-- `touch-target-size` - Min 44×44pt (Apple) / 48×48dp (Material); extend hit area beyond visual bounds if needed
+- `touch-target-size` - Min 44x44pt (Apple) / 48x48dp (Material); extend hit area beyond visual bounds if needed
 - `touch-spacing` - Minimum 8px/8dp gap between touch targets (Apple HIG, MD)
 - `hover-vs-tap` - Use click/tap for primary interactions; don't rely on hover alone
 - `loading-buttons` - Disable button during async operations; show spinner or progress
@@ -145,7 +145,7 @@ This Skill is not needed in the following situations:
 - `mobile-first` - Design mobile-first, then scale up to tablet and desktop
 - `breakpoint-consistency` - Use systematic breakpoints (e.g. 375 / 768 / 1024 / 1440)
 - `readable-font-size` - Minimum 16px body text on mobile (avoids iOS auto-zoom)
-- `line-length-control` - Mobile 35–60 chars per line; desktop 60–75 chars
+- `line-length-control` - Mobile 35-60 chars per line; desktop 60-75 chars
 - `horizontal-scroll` - No horizontal scroll on mobile; ensure content fits viewport width
 - `spacing-scale` - Use 4pt/8dp incremental spacing system (Material Design)
 - `touch-density` - Keep component spacing comfortable for touch: not cramped, not causing mis-taps
@@ -156,7 +156,7 @@ This Skill is not needed in the following situations:
 - `viewport-units` - Prefer min-h-dvh over 100vh on mobile
 - `orientation-support` - Keep layout readable and operable in landscape mode
 - `content-priority` - Show core content first on mobile; fold or hide secondary content
-- `visual-hierarchy` - Establish hierarchy via size, spacing, contrast — not color alone
+- `visual-hierarchy` - Establish hierarchy via size, spacing, contrast - not color alone
 
 ### 6. Typography & Color (MEDIUM)
 
@@ -166,7 +166,7 @@ This Skill is not needed in the following situations:
 - `font-scale` - Consistent type scale (e.g. 12 14 16 18 24 32)
 - `contrast-readability` - Darker text on light backgrounds (e.g. slate-900 on white)
 - `text-styles-system` - Use platform type system: iOS 11 Dynamic Type styles / Material 5 type roles (display, headline, title, body, label) (HIG, MD)
-- `weight-hierarchy` - Use font-weight to reinforce hierarchy: Bold headings (600–700), Regular body (400), Medium labels (500) (MD)
+- `weight-hierarchy` - Use font-weight to reinforce hierarchy: Bold headings (600-700), Regular body (400), Medium labels (500) (MD)
 - `color-semantic` - Define semantic color tokens (primary, secondary, error, surface, on-surface) not raw hex in components (Material color system)
 - `color-dark-mode` - Dark mode uses desaturated / lighter tonal variants, not inverted colors; test contrast separately (HIG, MD)
 - `color-accessible-pairs` - Foreground/background pairs must meet 4.5:1 (AA) or 7:1 (AAA); use tools to verify (WCAG, MD)
@@ -178,7 +178,7 @@ This Skill is not needed in the following situations:
 
 ### 7. Animation (MEDIUM)
 
-- `duration-timing` - Use 150–300ms for micro-interactions; complex transitions ≤400ms; avoid >500ms (MD)
+- `duration-timing` - Use 150-300ms for micro-interactions; complex transitions <=400ms; avoid >500ms (MD)
 - `transform-performance` - Use transform/opacity only; avoid animating width/height/top/left
 - `loading-states` - Show skeleton or progress indicator when loading exceeds 300ms
 - `excessive-motion` - Animate 1-2 key elements per view max
@@ -188,19 +188,19 @@ This Skill is not needed in the following situations:
 - `continuity` - Page/screen transitions should maintain spatial continuity (shared element, directional slide) (Apple HIG)
 - `parallax-subtle` - Use parallax sparingly; must respect reduced-motion and not cause disorientation (Apple HIG)
 - `spring-physics` - Prefer spring/physics-based curves over linear or cubic-bezier for natural feel (Apple HIG fluid animations)
-- `exit-faster-than-enter` - Exit animations shorter than enter (~60–70% of enter duration) to feel responsive (MD motion)
-- `stagger-sequence` - Stagger list/grid item entrance by 30–50ms per item; avoid all-at-once or too-slow reveals (MD)
+- `exit-faster-than-enter` - Exit animations shorter than enter (~60-70% of enter duration) to feel responsive (MD motion)
+- `stagger-sequence` - Stagger list/grid item entrance by 30-50ms per item; avoid all-at-once or too-slow reveals (MD)
 - `shared-element-transition` - Use shared element / hero transitions for visual continuity between screens (MD, HIG)
 - `interruptible` - Animations must be interruptible; user tap/gesture cancels in-progress animation immediately (Apple HIG)
 - `no-blocking-animation` - Never block user input during an animation; UI must stay interactive (Apple HIG)
 - `fade-crossfade` - Use crossfade for content replacement within the same container (MD)
-- `scale-feedback` - Subtle scale (0.95–1.05) on press for tappable cards/buttons; restore on release (HIG, MD)
+- `scale-feedback` - Subtle scale (0.95-1.05) on press for tappable cards/buttons; restore on release (HIG, MD)
 - `gesture-feedback` - Drag, swipe, and pinch must provide real-time visual response tracking the finger (MD Motion)
 - `hierarchy-motion` - Use translate/scale direction to express hierarchy: enter from below = deeper, exit upward = back (MD)
 - `motion-consistency` - Unify duration/easing tokens globally; all animations share the same rhythm and feel
 - `opacity-threshold` - Fading elements should not linger below opacity 0.2; either fade fully or remain visible
 - `modal-motion` - Modals/sheets should animate from their trigger source (scale+fade or slide-in) for spatial context (HIG, MD)
-- `navigation-direction` - Forward navigation animates left/up; backward animates right/down — keep direction logically consistent (HIG)
+- `navigation-direction` - Forward navigation animates left/up; backward animates right/down - keep direction logically consistent (HIG)
 - `layout-shift-avoid` - Animations must not cause layout reflow or CLS; use transform for position changes
 
 ### 8. Forms & Feedback (MEDIUM)
@@ -213,7 +213,7 @@ This Skill is not needed in the following situations:
 - `toast-dismiss` - Auto-dismiss toasts in 3-5s
 - `confirmation-dialogs` - Confirm before destructive actions
 - `input-helper-text` - Provide persistent helper text below complex inputs, not just placeholder (Material Design)
-- `disabled-states` - Disabled elements use reduced opacity (0.38–0.5) + cursor change + semantic attribute (MD)
+- `disabled-states` - Disabled elements use reduced opacity (0.38-0.5) + cursor change + semantic attribute (MD)
 - `progressive-disclosure` - Reveal complex options progressively; don't overwhelm users upfront (Apple HIG)
 - `inline-validation` - Validate on blur (not keystroke); show error only after user finishes input (MD)
 - `input-type-keyboard` - Use semantic input types (email, tel, number) to trigger the correct mobile keyboard (HIG, MD)
@@ -230,7 +230,7 @@ This Skill is not needed in the following situations:
 - `read-only-distinction` - Read-only state should be visually and semantically different from disabled (MD)
 - `focus-management` - After submit error, auto-focus the first invalid field (WCAG, MD)
 - `error-summary` - For multiple errors, show summary at top with anchor links to each field (WCAG)
-- `touch-friendly-input` - Mobile input height ≥44px to meet touch target requirements (Apple HIG)
+- `touch-friendly-input` - Mobile input height >=44px to meet touch target requirements (Apple HIG)
 - `destructive-emphasis` - Destructive actions use semantic danger color (red) and are visually separated from primary actions (HIG, MD)
 - `toast-accessibility` - Toasts must not steal focus; use aria-live="polite" for screen reader announcement (WCAG)
 - `aria-live-errors` - Form errors use aria-live region or role="alert" to notify screen readers (WCAG)
@@ -256,7 +256,7 @@ This Skill is not needed in the following situations:
 - `tab-badge` - Use badges on nav items sparingly to indicate unread/pending; clear after user visits (HIG, MD)
 - `overflow-menu` - When actions exceed available space, use overflow/more menu instead of cramming (MD)
 - `bottom-nav-top-level` - Bottom nav is for top-level screens only; never nest sub-navigation inside it (MD)
-- `adaptive-navigation` - Large screens (≥1024px) prefer sidebar; small screens use bottom/top nav (Material Adaptive)
+- `adaptive-navigation` - Large screens (>=1024px) prefer sidebar; small screens use bottom/top nav (Material Adaptive)
 - `back-stack-integrity` - Never silently reset the navigation stack or unexpectedly jump to home (HIG, MD)
 - `navigation-consistency` - Navigation placement must stay the same across all pages; don't change by page type
 - `avoid-mixed-patterns` - Don't mix Tab + Sidebar + Bottom Nav at the same hierarchy level
@@ -268,7 +268,7 @@ This Skill is not needed in the following situations:
 
 ### 10. Charts & Data (LOW)
 
-- `chart-type` - Match chart type to data type (trend → line, comparison → bar, proportion → pie/donut)
+- `chart-type` - Match chart type to data type (trend -> line, comparison -> bar, proportion -> pie/donut)
 - `color-guidance` - Use accessible color palettes; avoid red/green only pairs for colorblind users (WCAG, MD)
 - `data-table` - Provide table alternative for accessibility; charts alone are not screen-reader friendly (WCAG)
 - `pattern-texture` - Supplement color with patterns, textures, or shapes so data is distinguishable without color (WCAG, MD)
@@ -281,9 +281,9 @@ This Skill is not needed in the following situations:
 - `animation-optional` - Chart entrance animations must respect prefers-reduced-motion; data should be readable immediately (HIG)
 - `large-dataset` - For 1000+ data points, aggregate or sample; provide drill-down for detail instead of rendering all (MD)
 - `number-formatting` - Use locale-aware formatting for numbers, dates, currencies on axes and labels (HIG, MD)
-- `touch-target-chart` - Interactive chart elements (points, segments) must have ≥44pt tap area or expand on touch (Apple HIG)
+- `touch-target-chart` - Interactive chart elements (points, segments) must have >=44pt tap area or expand on touch (Apple HIG)
 - `no-pie-overuse` - Avoid pie/donut for >5 categories; switch to bar chart for clarity
-- `contrast-data` - Data lines/bars vs background ≥3:1; data text labels ≥4.5:1 (WCAG)
+- `contrast-data` - Data lines/bars vs background >=3:1; data text labels >=4.5:1 (WCAG)
 - `legend-interactive` - Legends should be clickable to toggle series visibility (MD)
 - `direct-labeling` - For small datasets, label values directly on the chart to reduce eye travel
 - `tooltip-keyboard` - Tooltip content must be keyboard-reachable and not rely on hover alone (WCAG)
@@ -334,19 +334,21 @@ winget install Python.Python.3.12
 
 ## How to Use This Skill
 
+> **Path note:** All commands below use `${SKILL_DIR}` as a placeholder for this skill's installed location. Replace it with the actual path under your assistant's skill directory - e.g., `.claude/skills/ui-ux-pro-max`, `.agents/skills/ui-ux-pro-max`, or `.codex/skills/ui-ux-pro-max`. If you run from the toolkit repo directly, use `skills/ui-ux-pro-max`.
+
 Use this skill when the user requests any of the following:
 
 | Scenario | Trigger Examples | Start From |
 |----------|-----------------|------------|
-| **New project / page** | "Build a landing page", "Build a dashboard" | Step 1 → Step 2 (design system) |
+| **New project / page** | "Build a landing page", "Build a dashboard" | Step 1 -> Step 2 (design system) |
 | **New component** | "Create a pricing card", "Add a modal" | Step 3 (domain search: style, ux) |
 | **Choose style / color / font** | "What style fits a fintech app?", "Recommend a color palette" | Step 2 (design system) |
 | **Review existing UI** | "Review this page for UX issues", "Check accessibility" | Quick Reference checklist above |
-| **Fix a UI bug** | "Button hover is broken", "Layout shifts on load" | Quick Reference → relevant section |
+| **Fix a UI bug** | "Button hover is broken", "Layout shifts on load" | Quick Reference -> relevant section |
 | **Improve / optimize** | "Make this faster", "Improve mobile experience" | Step 3 (domain search: ux, react) |
 | **Implement dark mode** | "Add dark mode support" | Step 3 (domain: style "dark mode") |
 | **Add charts / data viz** | "Add an analytics dashboard chart" | Step 3 (domain: chart) |
-| **Stack best practices** | "React performance tips"、"SwiftUI navigation" | Step 4 (stack search) |
+| **Stack best practices** | "React performance tips", "SwiftUI navigation" | Step 4 (stack search) |
 
 Follow this workflow:
 
@@ -363,7 +365,7 @@ Extract key information from user request:
 **Always start with `--design-system`** to get comprehensive recommendations with reasoning:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
+python3 ${SKILL_DIR}/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
 ```
 
 This command:
@@ -374,7 +376,7 @@ This command:
 
 **Example:**
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
+python3 ${SKILL_DIR}/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
 ```
 
 ### Step 2b: Persist Design System (Master + Overrides Pattern)
@@ -382,20 +384,20 @@ python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --d
 To save the design system for **hierarchical retrieval across sessions**, add `--persist`:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name"
+python3 ${SKILL_DIR}/scripts/search.py "<query>" --design-system --persist -p "Project Name"
 ```
 
 This creates:
-- `design-system/MASTER.md` — Global Source of Truth with all design rules
-- `design-system/pages/` — Folder for page-specific overrides
+- `design-system/MASTER.md` - Global Source of Truth with all design rules
+- `design-system/pages/` - Folder for page-specific overrides
 
 **With page-specific override:**
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --page "dashboard"
+python3 ${SKILL_DIR}/scripts/search.py "<query>" --design-system --persist -p "Project Name" --page "dashboard"
 ```
 
 This also creates:
-- `design-system/pages/dashboard.md` — Page-specific deviations from Master
+- `design-system/pages/dashboard.md` - Page-specific deviations from Master
 
 **How hierarchical retrieval works:**
 1. When building a specific page (e.g., "Checkout"), first check `design-system/pages/checkout.md`
@@ -416,7 +418,7 @@ Now, generate the code...
 After getting the design system, use domain searches to get additional details:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
+python3 ${SKILL_DIR}/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
 ```
 
 **When to use detailed searches:**
@@ -441,7 +443,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n
 Get React Native implementation-specific best practices:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack react-native
+python3 ${SKILL_DIR}/scripts/search.py "<keyword>" --stack react-native
 ```
 
 ---
@@ -485,7 +487,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack react-native
 ### Step 2: Generate Design System (REQUIRED)
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "AI search tool modern minimal" --design-system -p "AI Search"
+python3 ${SKILL_DIR}/scripts/search.py "AI search tool modern minimal" --design-system -p "AI Search"
 ```
 
 **Output:** Complete design system with pattern, style, colors, typography, effects, and anti-patterns.
@@ -494,16 +496,16 @@ python3 skills/ui-ux-pro-max/scripts/search.py "AI search tool modern minimal" -
 
 ```bash
 # Get style options for a modern tool product
-python3 skills/ui-ux-pro-max/scripts/search.py "minimalism dark mode" --domain style
+python3 ${SKILL_DIR}/scripts/search.py "minimalism dark mode" --domain style
 
 # Get UX best practices for search interaction and loading
-python3 skills/ui-ux-pro-max/scripts/search.py "search loading animation" --domain ux
+python3 ${SKILL_DIR}/scripts/search.py "search loading animation" --domain ux
 ```
 
 ### Step 4: Stack Guidelines
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "list performance navigation" --stack react-native
+python3 ${SKILL_DIR}/scripts/search.py "list performance navigation" --stack react-native
 ```
 
 **Then:** Synthesize design system + detailed searches and implement the design.
@@ -516,10 +518,10 @@ The `--design-system` flag supports two output formats:
 
 ```bash
 # ASCII box (default) - best for terminal display
-python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system
+python3 ${SKILL_DIR}/scripts/search.py "fintech crypto" --design-system
 
 # Markdown - best for documentation
-python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system -f markdown
+python3 ${SKILL_DIR}/scripts/search.py "fintech crypto" --design-system -f markdown
 ```
 
 ---
@@ -528,8 +530,8 @@ python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system 
 
 ### Query Strategy
 
-- Use **multi-dimensional keywords** — combine product + industry + tone + density: `"entertainment social vibrant content-dense"` not just `"app"`
-- Try different keywords for the same need: `"playful neon"` → `"vibrant dark"` → `"content-first minimal"`
+- Use **multi-dimensional keywords** - combine product + industry + tone + density: `"entertainment social vibrant content-dense"` not just `"app"`
+- Try different keywords for the same need: `"playful neon"` -> `"vibrant dark"` -> `"content-first minimal"`
 - Use `--design-system` first for full recommendations, then `--domain` to deep-dive any dimension you're unsure about
 - Always add `--stack react-native` for implementation-specific guidance
 
@@ -538,21 +540,21 @@ python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system 
 | Problem | What to Do |
 |---------|------------|
 | Can't decide on style/color | Re-run `--design-system` with different keywords |
-| Dark mode contrast issues | Quick Reference §6: `color-dark-mode` + `color-accessible-pairs` |
-| Animations feel unnatural | Quick Reference §7: `spring-physics` + `easing` + `exit-faster-than-enter` |
-| Form UX is poor | Quick Reference §8: `inline-validation` + `error-clarity` + `focus-management` |
-| Navigation feels confusing | Quick Reference §9: `nav-hierarchy` + `bottom-nav-limit` + `back-behavior` |
-| Layout breaks on small screens | Quick Reference §5: `mobile-first` + `breakpoint-consistency` |
-| Performance / jank | Quick Reference §3: `virtualize-lists` + `main-thread-budget` + `debounce-throttle` |
+| Dark mode contrast issues | Quick Reference Section 6: `color-dark-mode` + `color-accessible-pairs` |
+| Animations feel unnatural | Quick Reference Section 7: `spring-physics` + `easing` + `exit-faster-than-enter` |
+| Form UX is poor | Quick Reference Section 8: `inline-validation` + `error-clarity` + `focus-management` |
+| Navigation feels confusing | Quick Reference Section 9: `nav-hierarchy` + `bottom-nav-limit` + `back-behavior` |
+| Layout breaks on small screens | Quick Reference Section 5: `mobile-first` + `breakpoint-consistency` |
+| Performance / jank | Quick Reference Section 3: `virtualize-lists` + `main-thread-budget` + `debounce-throttle` |
 
 ### Pre-Delivery Checklist
 
 - Run `--domain ux "animation accessibility z-index loading"` as a UX validation pass before implementation
-- Run through Quick Reference **§1–§3** (CRITICAL + HIGH) as a final review
+- Run through Quick Reference **Section 1-Section 3** (CRITICAL + HIGH) as a final review
 - Test on 375px (small phone) and landscape orientation
 - Verify behavior with **reduced-motion** enabled and **Dynamic Type** at largest size
 - Check dark mode contrast independently (don't assume light mode values work)
-- Confirm all touch targets ≥44pt and no content hidden behind safe areas
+- Confirm all touch targets >=44pt and no content hidden behind safe areas
 
 ---
 
@@ -565,14 +567,14 @@ Scope notice: The rules below are for App UI (iOS/Android/React Native/Flutter),
 
 | Rule | Standard | Avoid | Why It Matters |
 |------|----------|--------|----------------|
-| **No Emoji as Structural Icons** | Use vector-based icons (e.g., Lucide, react-native-vector-icons, @expo/vector-icons). | Using emojis (🎨 🚀 ⚙️) for navigation, settings, or system controls. | Emojis are font-dependent, inconsistent across platforms, and cannot be controlled via design tokens. |
+| **No Emoji as Structural Icons** | Use vector-based icons (e.g., Lucide, react-native-vector-icons, @expo/vector-icons). | Using emojis (palette rocket gear) for navigation, settings, or system controls. | Emojis are font-dependent, inconsistent across platforms, and cannot be controlled via design tokens. |
 | **Vector-Only Assets** | Use SVG or platform vector icons that scale cleanly and support theming. | Raster PNG icons that blur or pixelate. | Ensures scalability, crisp rendering, and dark/light mode adaptability. |
 | **Stable Interaction States** | Use color, opacity, or elevation transitions for press states without changing layout bounds. | Layout-shifting transforms that move surrounding content or trigger visual jitter. | Prevents unstable interactions and preserves smooth motion/perceived quality on mobile. |
 | **Correct Brand Logos** | Use official brand assets and follow their usage guidelines (spacing, color, clear space). | Guessing logo paths, recoloring unofficially, or modifying proportions. | Prevents brand misuse and ensures legal/platform compliance. |
 | **Consistent Icon Sizing** | Define icon sizes as design tokens (e.g., icon-sm, icon-md = 24pt, icon-lg). | Mixing arbitrary values like 20pt / 24pt / 28pt randomly. | Maintains rhythm and visual hierarchy across the interface. |
 | **Stroke Consistency** | Use a consistent stroke width within the same visual layer (e.g., 1.5px or 2px). | Mixing thick and thin stroke styles arbitrarily. | Inconsistent strokes reduce perceived polish and cohesion. |
 | **Filled vs Outline Discipline** | Use one icon style per hierarchy level. | Mixing filled and outline icons at the same hierarchy level. | Maintains semantic clarity and stylistic coherence. |
-| **Touch Target Minimum** | Minimum 44×44pt interactive area (use hitSlop if icon is smaller). | Small icons without expanded tap area. | Meets accessibility and platform usability standards. |
+| **Touch Target Minimum** | Minimum 44x44pt interactive area (use hitSlop if icon is smaller). | Small icons without expanded tap area. | Meets accessibility and platform usability standards. |
 | **Icon Alignment** | Align icons to text baseline and maintain consistent padding. | Misaligned icons or inconsistent spacing around them. | Prevents subtle visual imbalance that reduces perceived quality. |
 | **Icon Contrast** | Follow WCAG contrast standards: 4.5:1 for small elements, 3:1 minimum for larger UI glyphs. | Low-contrast icons that blend into the background. | Ensures accessibility in both light and dark modes. |
 

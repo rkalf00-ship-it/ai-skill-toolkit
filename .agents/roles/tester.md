@@ -47,7 +47,7 @@ Verification Status:
 - passed | failed | blocked
 
 Commands Run:
-- `...` → pass/fail
+- `...` -> pass/fail
 
 Results:
 - ...
