@@ -22,13 +22,27 @@ triggers:
     - business logic
     - UI design
 requires:
-  os: [windows, macos, linux]
   bin: [git]
 ---
 
 # Git Workflow Patterns
 
 Best practices for Git version control, branching strategies, and collaborative development.
+
+## Contract
+
+Inputs:
+- Current repository state, desired workflow operation, and team/release constraints.
+- Branch, commit, PR, tag, or changelog requirements.
+
+Outputs:
+- Concrete git command sequence or workflow recommendation.
+- Commit/PR/tag/changelog text when requested.
+- Risk notes for history rewriting, conflicts, or protected branches.
+
+Verification:
+- Inspect `git status`, branches, remotes, and relevant diffs before advising destructive operations.
+- Never rewrite shared history without explicit approval.
 
 ## When to Activate
 

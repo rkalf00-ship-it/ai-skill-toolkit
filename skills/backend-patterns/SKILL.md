@@ -1,7 +1,7 @@
 ---
 name: backend-patterns
 id: backend-patterns
-description: Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.
+description: Backend architecture patterns, service boundaries, database optimization, caching, background jobs, middleware, and server-side best practices for Node.js, Express, and Next.js API routes. Use api-design for endpoint contracts and REST surface decisions.
 category: architecture
 version: 1.0.0
 triggers:
@@ -24,7 +24,6 @@ triggers:
     - UI styling
     - mobile layout
 requires:
-  os: [windows, macos, linux]
 ---
 
 # Backend Development Patterns
@@ -33,7 +32,7 @@ Backend architecture patterns and best practices for scalable server-side applic
 
 ## When to Activate
 
-- Designing REST or GraphQL API endpoints
+- Implementing backend internals behind an already chosen API surface
 - Implementing repository, service, or controller layers
 - Optimizing database queries (N+1, indexing, connection pooling)
 - Adding caching (Redis, in-memory, HTTP cache headers)
@@ -41,22 +40,29 @@ Backend architecture patterns and best practices for scalable server-side applic
 - Structuring error handling and validation for APIs
 - Building middleware (auth, logging, rate limiting)
 
-## API Design Patterns
+## Boundary with API Design
 
-### RESTful API Structure
+Use `api-design` as the primary skill for endpoint naming, HTTP semantics,
+pagination, filtering, versioning, status codes, and response/error contracts.
+Use this skill after the API surface is chosen, or when the task is primarily
+about service layers, repositories, database access, caching, jobs, middleware,
+or operational backend behavior.
 
-```typescript
-// PASS: Resource-based URLs
-GET    /api/markets                 # List resources
-GET    /api/markets/:id             # Get single resource
-POST   /api/markets                 # Create resource
-PUT    /api/markets/:id             # Replace resource
-PATCH  /api/markets/:id             # Update resource
-DELETE /api/markets/:id             # Delete resource
+## Contract
 
-// PASS: Query parameters for filtering, sorting, pagination
-GET /api/markets?status=active&sort=volume&limit=20&offset=0
-```
+Inputs:
+- Existing stack, framework, and data stores.
+- Backend behavior to implement or review.
+- Known constraints: latency, consistency, auth model, scaling, deployment, and failure tolerance.
+
+Outputs:
+- Recommended backend structure or patch plan.
+- Data access, service, caching, queue, and error-handling decisions.
+- Tests or verification commands relevant to the chosen backend layer.
+
+Verification:
+- Prefer repository-specific build, typecheck, lint, and test commands.
+- For data or concurrency changes, include failure-path and rollback considerations.
 
 ### Repository Pattern
 

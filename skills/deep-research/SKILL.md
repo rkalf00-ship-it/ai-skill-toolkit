@@ -20,8 +20,6 @@ triggers:
     - refactor
     - implement
 requires:
-  mcp: [firecrawl, exa]
-  os: [windows, macos, linux]
 ---
 
 # Deep Research
@@ -36,6 +34,42 @@ Produce thorough, cited research reports from multiple web sources using firecra
 - Any question requiring synthesis from multiple sources
 - User says "research", "deep dive", "investigate", or "what's the current state of"
 
+## Contract
+
+Inputs:
+- Research topic or decision question.
+- Desired depth, audience, recency window, and source constraints when provided.
+- Any sources, domains, jurisdictions, or competitors that must be included or excluded.
+
+Outputs:
+- Cited research report with executive summary, themes, key takeaways, sources, and methodology.
+- Clear distinction between sourced facts, estimates, and model inference.
+- Explicit uncertainty notes for thin or conflicting evidence.
+
+Verification:
+- Use at least two independent sources for important claims when the topic allows it.
+- Include source attribution for factual claims that are not common knowledge.
+- State the search/read methodology and any source access limitations.
+
+Failure mode:
+- If firecrawl/exa MCP tools are unavailable, use the fallback ladder below.
+- Never fabricate sources, citations, publication dates, or source quotes.
+- If no current-source access is available, stop and state that current-source
+  research cannot be completed in this environment.
+
+Fallback ladder:
+1. Use any configured research MCPs named by the host environment.
+2. Use the host's approved web/search/browse tool, restricted by the user's source,
+   date, domain, and jurisdiction constraints.
+3. Use user-provided URLs, PDFs, repository files, or pasted source text.
+4. If none of the above exists, ask for sources or permission to enable a search tool.
+
+Fallback output requirements:
+- Label the methodology as `MCP research`, `web-search fallback`,
+  `user-provided source review`, or `blocked`.
+- Cite every non-obvious factual claim to a source URL/title when source access is available.
+- State source limitations before recommendations when the evidence base is thin.
+
 ## MCP Requirements
 
 At least one of:
@@ -43,6 +77,8 @@ At least one of:
 - **exa** - `web_search_exa`, `web_search_advanced_exa`, `crawling_exa`
 
 Both together give the best coverage. Configure in `~/.claude.json` or `~/.codex/config.toml`.
+These MCPs are preferred tools, not hard requirements, because the fallback policy
+above defines how to proceed when they are missing.
 
 ## Workflow
 
@@ -66,7 +102,8 @@ Break the topic into 3-5 research sub-questions. Example:
 
 ### Step 3: Execute Multi-Source Search
 
-For EACH sub-question, search using available MCP tools:
+For EACH sub-question, search using the best available source-access path from
+the MCP requirements or fallback ladder:
 
 **With firecrawl:**
 ```
@@ -114,8 +151,8 @@ Structure the report:
 
 ## 1. [First Major Theme]
 [Findings with inline citations]
-- Key point ([Source Name](url))
-- Supporting data ([Source Name](url))
+- Key point (Source Name: `<source-url>`)
+- Supporting data (Source Name: `<source-url>`)
 
 ## 2. [Second Major Theme]
 ...
@@ -129,7 +166,7 @@ Structure the report:
 - [Actionable insight 3]
 
 ## Sources
-1. [Title](url) - [one-line summary]
+1. Title - `<source-url>` - one-line summary
 2. ...
 
 ## Methodology

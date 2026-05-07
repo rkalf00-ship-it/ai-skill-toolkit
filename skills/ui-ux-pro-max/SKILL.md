@@ -26,13 +26,46 @@ triggers:
     - DevOps
     - non-visual script
 requires:
-  os: [windows, macos, linux]
   bin: [python3]
 ---
 
 # UI/UX Pro Max - Design Intelligence
 
 Comprehensive design guide for web and mobile applications. Contains 50+ styles, 161 color palettes, 57 font pairings, 161 product types with reasoning rules, 99 UX guidelines, and 25 chart types across 10 technology stacks. Searchable database with priority-based recommendations.
+
+## Contract
+
+Inputs:
+- Product type, target users, platform, stack, brand constraints, and UI task.
+- Existing design system, screenshots, or component conventions when available.
+
+Outputs:
+- Design-system recommendation, component/layout guidance, or UX review findings.
+- Accessibility, responsive, interaction, typography, color, and performance checks.
+- Script query results or generated design artifacts when applicable.
+
+Verification:
+- Start from the compact rules below, then use scripts/data only for the relevant domain.
+- Check text fit, contrast, touch targets, responsive behavior, and visible interaction states before delivery.
+
+## Context Loading Policy
+
+This skill ships large CSV data and templates. Treat those files as an indexed
+knowledge base, not as prompt context.
+
+Default behavior:
+- Read this `SKILL.md` only.
+- Do not open `data/*.csv`, `data/stacks/*.csv`, or `templates/**` directly during normal use.
+- Use `scripts/search.py` or `scripts/design_system.py` for the specific product, style, stack, chart, color, typography, or UX domain needed by the task.
+- Load a raw data/template file only when debugging the skill itself or when a script fails and the exact file is needed.
+
+Fallback:
+- If Python or the search scripts are unavailable, use the compact rule categories
+  in this file and state that the full design database was not queried.
+
+Verification:
+- Before final delivery, verify that only task-relevant domains were queried or
+  explain why a broader query was necessary.
 
 ## When to Apply
 
@@ -387,9 +420,10 @@ Extract key information from user request:
 - **Style keywords**: playful, vibrant, minimal, dark mode, content-first, immersive, etc.
 - **Stack**: React Native (this project's only tech stack)
 
-### Step 2: Generate Design System (REQUIRED)
+### Step 2: Generate Design System When Visual Direction Is Needed
 
-**Always start with `--design-system`** to get comprehensive recommendations with reasoning:
+For new visual direction, branding, landing pages, dashboards, or broad redesigns,
+start with `--design-system` to get recommendations with reasoning:
 
 ```bash
 python3 ${SKILL_DIR}/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]

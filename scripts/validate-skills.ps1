@@ -1,11 +1,14 @@
 <#
 .SYNOPSIS
-  Validate AI Skill Toolkit SKILL.md frontmatter against the toolkit schema.
+  Validate AI Skill Toolkit skill metadata, content contracts, links, manifests, and plugins.
 
 .DESCRIPTION
-  Default mode: enforces only the Anthropic Skills hard-required fields (name, description).
-  Strict mode (-Strict): additionally requires id, category, version, and id == folder name.
-  Always warns on missing recommended fields (triggers, requires).
+  Default mode: enforces only the Anthropic Skills hard-required fields (name, description)
+  and warns on toolkit-required content contracts.
+  Strict mode (-Strict): additionally requires id, category, version, id == folder name,
+  a Contract section with Inputs/Outputs/Verification, valid relative markdown links,
+  manifest consistency, and plugin descriptors.
+  Always warns on missing recommended fields (triggers, requires) outside strict mode.
 
 .PARAMETER Path
   Root folder to scan. Defaults to ./skills relative to the toolkit root.
@@ -267,6 +270,81 @@ function Test-SkillFrontmatter {
   return @{ Errors = $errors; Warnings = $warnings }
 }
 
+function Test-SkillContent {
+  param(
+    [string]$Content,
+    [string]$FilePath,
+    [bool]$Strict
+  )
+
+  $errors   = @()
+  $warnings = @()
+
+  if ($Content -notmatch '(?im)^##\s+Contract\s*$') {
+    $msg = "missing required '## Contract' section"
+    if ($Strict) { $errors += $msg } else { $warnings += $msg }
+  } else {
+    foreach ($label in @('Inputs:', 'Outputs:', 'Verification:')) {
+      if ($Content -notmatch [regex]::Escape($label)) {
+        $msg = "Contract section missing '$label'"
+        if ($Strict) { $errors += $msg } else { $warnings += $msg }
+      }
+    }
+  }
+
+  $fileDir = Split-Path -Parent $FilePath
+  $linkMatches = [regex]::Matches($Content, '\[[^\]]+\]\(([^)]+)\)')
+  foreach ($match in $linkMatches) {
+    $target = $match.Groups[1].Value.Trim()
+    if (-not $target) { continue }
+    if ($target -match '^(https?:|mailto:|#)') { continue }
+    if ($target -match '^[a-zA-Z][a-zA-Z0-9+.-]*:') { continue }
+
+    $targetNoFragment = ($target -split '#', 2)[0]
+    if (-not $targetNoFragment) { continue }
+    $targetNoFragment = [uri]::UnescapeDataString($targetNoFragment)
+    $resolvedTarget = Join-Path $fileDir ($targetNoFragment.Replace('/', '\'))
+    if (-not (Test-Path -LiteralPath $resolvedTarget)) {
+      $errors += "broken relative markdown link '$target' (resolved to $resolvedTarget)"
+    }
+  }
+
+  if ((Get-Item -LiteralPath $FilePath).Length -gt 30000 -and
+      $Content -notmatch '(?im)^##\s+Context Loading Policy\s*$') {
+    $msg = "large SKILL.md over 30KB should include '## Context Loading Policy'"
+    if ($Strict) { $errors += $msg } else { $warnings += $msg }
+  }
+
+  if ($Content -match '(?im)coverage[^\r\n]{0,40}(80%|80\s+percent)|((80%|80\s+percent)[^\r\n]{0,40}coverage)') {
+    $msg = "hard-coded 80% coverage guidance found; use repository-defined coverage policy instead"
+    if ($Strict) { $errors += $msg } else { $warnings += $msg }
+  }
+
+  $skillId = Split-Path -Leaf (Split-Path -Parent $FilePath)
+  if ($skillId -eq 'frontend-patterns' -and
+      $Content -notmatch '(?im)^##\s+Stack Boundary\s*$') {
+    $msg = "frontend-patterns must include a Stack Boundary section because it is React/Next.js-specific"
+    if ($Strict) { $errors += $msg } else { $warnings += $msg }
+  }
+
+  if ($skillId -eq 'ui-ux-pro-max') {
+    foreach ($requiredPolicy in @('Do not open `data/*.csv`', 'scripts/search.py', 'Fallback:', 'Verification:')) {
+      if ($Content -notmatch [regex]::Escape($requiredPolicy)) {
+        $msg = "ui-ux-pro-max Context Loading Policy missing '$requiredPolicy'"
+        if ($Strict) { $errors += $msg } else { $warnings += $msg }
+      }
+    }
+  }
+
+  if ($skillId -in @('deep-research', 'documentation-lookup') -and
+      $Content -notmatch '(?im)^Fallback ladder:\s*$') {
+    $msg = "$skillId must include a concrete 'Fallback ladder:' section"
+    if ($Strict) { $errors += $msg } else { $warnings += $msg }
+  }
+
+  return @{ Errors = $errors; Warnings = $warnings }
+}
+
 function Get-JsonPropertyNames {
   param([object]$Object)
   return @($Object.PSObject.Properties | ForEach-Object { $_.Name })
@@ -507,6 +585,9 @@ foreach ($file in $skillFiles) {
   $fm      = ConvertFrom-SkillFrontmatter $content
 
   $result = Test-SkillFrontmatter -Fm $fm -FilePath $file.FullName -Strict:$Strict.IsPresent
+  $contentResult = Test-SkillContent -Content $content -FilePath $file.FullName -Strict:$Strict.IsPresent
+  $result.Errors += $contentResult.Errors
+  $result.Warnings += $contentResult.Warnings
 
   $hasErr  = $result.Errors.Count -gt 0
   $hasWarn = $result.Warnings.Count -gt 0

@@ -22,13 +22,50 @@ triggers:
     - this codebase
     - business logic
 requires:
-  mcp: [context7]
-  os: [windows, macos, linux]
 ---
 
 # Documentation Lookup (Context7)
 
 When the user asks about libraries, frameworks, or APIs, fetch current documentation via the Context7 MCP (tools `resolve-library-id` and `query-docs`) instead of relying on training data.
+
+## Contract
+
+Inputs:
+- Library, framework, API, or product name.
+- Specific task, error, setup goal, or API behavior question.
+- Version, runtime, language, or framework constraints when provided.
+
+Outputs:
+- Answer grounded in current documentation.
+- Minimal code example when useful.
+- Library/version cited when behavior is version-sensitive.
+- Uncertainty note when the selected docs do not directly answer the question.
+
+Verification:
+- Resolve the library ID before querying Context7.
+- Prefer official or primary package documentation.
+- Limit tool calls as described below and state when evidence is incomplete.
+
+Failure mode:
+- If Context7 is unavailable, use the fallback ladder below.
+- Never invent API signatures, version behavior, or migration guidance when current
+  documentation cannot be accessed.
+
+Fallback ladder:
+1. Use another configured documentation MCP if the host exposes one.
+2. Use the host's approved web/search/browse tool and restrict results to official
+   documentation domains or primary repositories.
+3. Use user-provided documentation URLs, local docs, lockfiles, package manifests,
+   or pasted excerpts.
+4. If none of the above exists, ask the user to provide docs or state that current
+   documentation lookup cannot be completed.
+
+Fallback output requirements:
+- Label the evidence path as `Context7`, `official-docs fallback`,
+  `local/user-provided docs`, or `blocked`.
+- Cite the library name and version/source when behavior is version-sensitive.
+- If only local package metadata is available, distinguish installed-version
+  inference from documented API behavior.
 
 ## Core Concepts
 

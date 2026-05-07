@@ -20,12 +20,27 @@ triggers:
     - gRPC service
     - internal RPC
 requires:
-  os: [windows, macos, linux]
 ---
 
 # API Design Patterns
 
 Conventions and best practices for designing consistent, developer-friendly REST APIs.
+
+## Contract
+
+Inputs:
+- Resource, operation, actor, auth model, and success/error cases.
+- Existing API conventions or compatibility constraints.
+- Pagination, filtering, sorting, versioning, and rate-limit requirements when relevant.
+
+Outputs:
+- Endpoint matrix with methods, paths, request/response shapes, and status codes.
+- Error response model and validation behavior.
+- Test checklist or OpenAPI snippet when useful.
+
+Verification:
+- Check HTTP semantics, auth boundaries, pagination limits, and error consistency.
+- Pair with `security-review` for sensitive, authenticated, payment, or file-upload APIs.
 
 ## When to Activate
 

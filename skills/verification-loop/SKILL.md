@@ -1,7 +1,7 @@
 ---
 name: verification-loop
 id: verification-loop
-description: A comprehensive verification system for Claude Code sessions covering build, types, lint, tests, security scan, and diff review. Use after completing a feature, before creating a PR, or when ensuring quality gates pass.
+description: A comprehensive verification system for AI coding sessions covering build, types, lint, tests, security scan, and diff review. Use after completing a feature, before creating a PR, or when ensuring quality gates pass.
 category: quality
 version: 1.0.0
 triggers:
@@ -19,12 +19,25 @@ triggers:
     - planning
     - architecture decision
 requires:
-  os: [windows, macos, linux]
 ---
 
 # Verification Loop Skill
 
-A comprehensive verification system for Claude Code sessions.
+A comprehensive verification system for AI coding sessions.
+
+## Contract
+
+Inputs:
+- Changed files, task objective, and repository-specific quality gates.
+- Available package manager, language tooling, and CI expectations.
+
+Outputs:
+- Verification report with command, result, evidence, skipped checks, and residual risk.
+- Fix recommendations for failing checks.
+
+Verification:
+- Detect project commands from package scripts, README/AGENTS/CONTRIBUTING, and language defaults.
+- Do not treat passing proxy checks as complete unless they cover the requested behavior.
 
 ## When to Use
 
@@ -68,11 +81,10 @@ ruff check . 2>&1 | head -30
 
 ### Phase 4: Test Suite
 ```bash
-# Run tests with coverage
+# Run tests with coverage when the repository exposes a coverage command
 npm run test -- --coverage 2>&1 | tail -50
 
-# Check coverage threshold
-# Target: 80% minimum
+# Check repository-defined thresholds or touched-behavior coverage evidence
 ```
 
 Report:

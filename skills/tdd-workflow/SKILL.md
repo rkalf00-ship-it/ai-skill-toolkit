@@ -1,7 +1,7 @@
 ---
 name: tdd-workflow
 id: tdd-workflow
-description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
+description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces behavior-first tests, RED/GREEN/REFACTOR flow, and repository-specific coverage gates.
 category: quality
 version: 1.0.0
 triggers:
@@ -20,12 +20,27 @@ triggers:
     - PoC
     - throwaway script
 requires:
-  os: [windows, macos, linux]
 ---
 
 # Test-Driven Development Workflow
 
-This skill ensures all code development follows TDD principles with comprehensive test coverage.
+This skill guides behavior-changing work through a practical RED/GREEN/REFACTOR loop. It uses repository-defined test and coverage policy instead of imposing a universal coverage percentage.
+
+## Contract
+
+Inputs:
+- Feature, bug, or refactor goal.
+- Existing test framework, test commands, and repository coverage policy.
+- Behavior that should change or remain stable.
+
+Outputs:
+- RED test or justified skip for non-behavioral changes.
+- Minimal implementation plan and GREEN verification evidence.
+- Refactor notes and coverage impact when relevant.
+
+Verification:
+- Use repository coverage thresholds if present.
+- If no threshold exists, focus coverage on touched behavior rather than enforcing a global percentage.
 
 ## When to Activate
 
@@ -37,14 +52,15 @@ This skill ensures all code development follows TDD principles with comprehensiv
 
 ## Core Principles
 
-### 1. Tests BEFORE Code
-ALWAYS write tests first, then implement code to make tests pass.
+### 1. Behavior Test Before Production Code
+For behavior-changing work, add or update the smallest test that would fail before the change, then implement code to make it pass.
+For documentation, formatting-only, configuration-only, or exploratory work, state why a RED test is not applicable and use the closest practical verification.
 
 ### 2. Coverage Requirements
-- Minimum 80% coverage (unit + integration + E2E)
-- All edge cases covered
-- Error scenarios tested
-- Boundary conditions verified
+- Use repository-defined coverage thresholds when they exist.
+- If the repository has no coverage policy, focus coverage on touched behavior and critical paths.
+- Cover meaningful edge cases, error scenarios, and boundary conditions relevant to the change.
+- Do not invent a global coverage percentage for repositories that do not define one.
 
 ### 3. Test Types
 
@@ -119,9 +135,9 @@ npm test
 # Tests should fail - we haven't implemented yet
 ```
 
-This step is mandatory and is the RED gate for all production changes.
+This step is the RED gate for behavior-changing production code.
 
-Before modifying business logic or other production code, you must verify a valid RED state via one of these paths:
+Before modifying business logic or other behavior-changing production code, verify a valid RED state via one of these paths:
 - Runtime RED:
   - The relevant test target compiles successfully
   - The new or changed test is actually executed
@@ -134,7 +150,7 @@ Before modifying business logic or other production code, you must verify a vali
 
 A test that was only written but not compiled and executed does not count as RED.
 
-Do not edit production code until this RED state is confirmed.
+Do not edit behavior-changing production code until this RED state is confirmed, unless the task is non-behavioral and the skip reason is stated.
 
 If the repository is under Git, create a checkpoint commit immediately after this stage is validated.
 Recommended commit message format:
@@ -182,10 +198,10 @@ Recommended commit message format:
 - `refactor: clean up after <feature or bug> implementation`
 - Verify that this checkpoint commit is on the current active branch before considering the TDD cycle complete
 
-### Step 7: Verify Coverage
+### Step 7: Verify Coverage Policy
 ```bash
 npm run test:coverage
-# Verify 80%+ coverage achieved
+# Verify repository-defined thresholds or touched-behavior coverage
 ```
 
 ## Testing Patterns
@@ -369,6 +385,8 @@ npm run test:coverage
 ```
 
 ### Coverage Thresholds
+Use the repository's existing threshold configuration when present. If adding a threshold to a project that has none, choose it with the team or user instead of inventing a default.
+
 ```json
 {
   "jest": {
@@ -457,7 +475,7 @@ npm test && npm run lint
 
 ## Best Practices
 
-1. **Write Tests First** - Always TDD
+1. **Write Behavior Tests First** - for behavior-changing production code
 2. **One Assert Per Test** - Focus on single behavior
 3. **Descriptive Test Names** - Explain what's tested
 4. **Arrange-Act-Assert** - Clear test structure
@@ -470,7 +488,7 @@ npm test && npm run lint
 
 ## Success Metrics
 
-- 80%+ code coverage achieved
+- Repository coverage policy satisfied, or touched behavior covered when no policy exists
 - All tests passing (green)
 - No skipped or disabled tests
 - Fast test execution (< 30s for unit tests)
@@ -479,4 +497,4 @@ npm test && npm run lint
 
 ---
 
-**Remember**: Tests are not optional. They are the safety net that enables confident refactoring, rapid development, and production reliability.
+**Remember**: Behavior-changing work needs executable evidence. Prefer tests when practical; when a test is not applicable, record the reason and the closest verification used.

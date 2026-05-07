@@ -23,6 +23,20 @@ requires:
 
 Use this skill when the user invokes `/goal <objective>` or explicitly asks for goal-based execution.
 
+## Contract
+
+Inputs:
+- User objective.
+- Repository context, available skills manifest, and requested constraints.
+
+Outputs:
+- Goal statement, success criteria, skill routing, execution plan, verification evidence, and result.
+- Changed files and residual risks when work modifies a repository.
+
+Verification:
+- Map success criteria to concrete evidence before declaring completion.
+- Open only the selected primary skill and necessary companion skills.
+
 ## Purpose
 
 Turn a broad objective into a bounded execution loop:

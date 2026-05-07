@@ -1,7 +1,7 @@
 ---
 name: frontend-patterns
 id: frontend-patterns
-description: Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.
+description: React and Next.js frontend development patterns for components, hooks, state management, performance optimization, and UI implementation. Do not use as the primary skill for Vue, Svelte, Angular, Flutter, SwiftUI, or other non-React stacks.
 category: architecture
 version: 1.0.0
 triggers:
@@ -11,7 +11,8 @@ triggers:
     - useEffect
     - custom hook
     - virtualization
-    - code splitting
+    - React code splitting
+    - Next.js
     - error boundary
     - framer-motion
     - controlled form
@@ -24,23 +25,52 @@ triggers:
     - database query
     - server-side
     - infrastructure
+    - Vue
+    - Svelte
+    - Angular
+    - Flutter
+    - SwiftUI
 requires:
-  os: [windows, macos, linux]
 ---
 
-# Frontend Development Patterns
+# React Frontend Development Patterns
 
-Modern frontend patterns for React, Next.js, and performant user interfaces.
+Modern frontend patterns for React, Next.js, and performant React-based user interfaces.
+
+## Contract
+
+Inputs:
+- React or Next.js UI behavior or component to implement/review.
+- Routing model, state management, styling system, and accessibility constraints.
+- Existing component conventions and test setup.
+
+Outputs:
+- Component/hook/state architecture recommendation or patch plan.
+- Accessibility, performance, and test considerations.
+- Integration notes for existing design-system or frontend conventions.
+
+Verification:
+- Prefer repository-specific build, typecheck, lint, unit, and component tests.
+- Pair with `ui-ux-pro-max` for visual design decisions and `e2e-testing` for browser flows.
+- If the target stack is not React or Next.js, do not apply React-specific patterns; use `documentation-lookup` or a stack-specific skill instead.
 
 ## When to Activate
 
 - Building React components (composition, props, rendering)
+- Working in a Next.js or React codebase
 - Managing state (useState, useReducer, Zustand, Context)
 - Implementing data fetching (SWR, React Query, server components)
 - Optimizing performance (memoization, virtualization, code splitting)
 - Working with forms (validation, controlled inputs, Zod schemas)
 - Handling client-side routing and navigation
 - Building accessible, responsive UI patterns
+
+## Stack Boundary
+
+Use this skill only when the repository or user request is React/Next.js based.
+For Vue, Svelte, Angular, Flutter, SwiftUI, or native mobile UI work, use current
+official documentation and stack-specific conventions instead of translating
+React patterns directly.
 
 ## Component Patterns
 

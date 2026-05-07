@@ -20,13 +20,29 @@ triggers:
     - integration test only
     - API test only
 requires:
-  os: [windows, macos, linux]
   bin: [node]
 ---
 
 # E2E Testing Patterns
 
 Comprehensive Playwright patterns for building stable, fast, and maintainable E2E test suites.
+
+## Contract
+
+Inputs:
+- Target user flow, application URL or launch command, and browser/device targets.
+- Authentication, fixture, seed data, and external service constraints.
+- Existing E2E framework conventions if present.
+
+Outputs:
+- Test plan or Playwright test changes.
+- Locator strategy, fixtures, artifact settings, and CI notes.
+- Failure triage with screenshot/trace/video paths when tests run.
+
+Verification:
+- Prefer semantic locators and deterministic waits.
+- Run the smallest relevant E2E subset before broader suites.
+- Report skipped browser/auth prerequisites explicitly.
 
 ## Test File Organization
 

@@ -19,7 +19,6 @@ triggers:
     - single-file script
     - new project from scratch
 requires:
-  os: [windows, macos, linux]
   bin: [git]
 ---
 
@@ -34,20 +33,56 @@ requires:
 - Auditing third-party dependencies embedded directly in source (not declared in package managers)
 - Preparing architecture decision records for monorepo reorganization
 
-## Installation
+## Contract
 
-```bash
-# Fetch only the pinned commit for reproducibility
-mkdir -p ~/.claude/skills/repo-scan
-git init repo-scan
-cd repo-scan
-git remote add origin https://github.com/haibindev/repo-scan.git
-git fetch --depth 1 origin 2742664
-git checkout --detach FETCH_HEAD
-cp -r . ~/.claude/skills/repo-scan
+Inputs:
+- Repository path to audit.
+- Desired depth: `fast`, `standard`, `deep`, or `full`.
+- Optional scope filters such as modules, languages, or directories to exclude.
+
+Outputs:
+- Repository inventory summary.
+- Third-party and generated-artifact findings.
+- Four-level verdicts per module: Core Asset, Extract & Merge, Rebuild, Deprecate.
+- Report path or clear blocker if the external scanner is unavailable.
+
+Verification:
+- Confirm `git` is available.
+- Confirm the target repository path exists.
+- If using the external scanner, report the pinned commit and output artifact path.
+
+Failure mode:
+- If the external scanner cannot be installed or run, perform a local fallback scan
+  with native file enumeration and clearly mark the result as a lightweight audit.
+
+## Optional External Scanner Installation
+
+The external scanner is optional and should be reviewed before use. Fetch the
+pinned commit for reproducibility.
+
+PowerShell:
+
+```powershell
+$dest = Join-Path $env:USERPROFILE ".agents\skills\repo-scan-external"
+New-Item -ItemType Directory -Force -Path $dest | Out-Null
+git init $dest
+git -C $dest remote add origin https://github.com/haibindev/repo-scan.git
+git -C $dest fetch --depth 1 origin 2742664
+git -C $dest checkout --detach FETCH_HEAD
 ```
 
-> Review the source before installing any agent skill.
+Bash:
+
+```bash
+dest="${HOME}/.agents/skills/repo-scan-external"
+mkdir -p "$dest"
+git init "$dest"
+git -C "$dest" remote add origin https://github.com/haibindev/repo-scan.git
+git -C "$dest" fetch --depth 1 origin 2742664
+git -C "$dest" checkout --detach FETCH_HEAD
+```
+
+> Review the source before installing or running any external agent skill.
 
 ## Core Capabilities
 

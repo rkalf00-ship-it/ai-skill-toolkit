@@ -20,12 +20,28 @@ triggers:
     - add feature
     - implement
 requires:
-  os: [windows, macos, linux]
 ---
 
 # Codebase Onboarding
 
 Systematically analyze an unfamiliar codebase and produce a structured onboarding guide. Designed for developers joining a new project or setting up Claude Code in an existing repo for the first time.
+
+## Contract
+
+Inputs:
+- Repository path and onboarding goal.
+- Preferred target artifact: conversation guide, `AGENTS.md`, `CLAUDE.md`, or both.
+- Existing project instructions that must be preserved.
+
+Outputs:
+- Architecture and entry-point summary.
+- Detected commands, conventions, risks, and common tasks.
+- Updated or proposed project instruction file when requested.
+
+Verification:
+- Read existing instruction files before writing.
+- Cite concrete files, scripts, and config evidence for detected conventions.
+- Keep generated instruction files focused and project-specific.
 
 ## When to Use
 

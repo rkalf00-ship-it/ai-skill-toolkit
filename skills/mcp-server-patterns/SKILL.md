@@ -19,7 +19,6 @@ triggers:
     - MCP client usage
     - calling an MCP from app
 requires:
-  os: [windows, macos, linux]
   bin: [node]
 ---
 
@@ -28,6 +27,21 @@ requires:
 The Model Context Protocol (MCP) lets AI assistants call tools, read resources, and use prompts from your server. Use this skill when building or maintaining MCP servers. The SDK API evolves; check Context7 (query-docs for "MCP") or the official MCP documentation for current method names and signatures.
 
 For the broader routing decision of when a capability should be a rule, a skill, MCP, or a plain CLI/API workflow, see [docs/capability-surface-selection.md](../../docs/capability-surface-selection.md).
+
+## Contract
+
+Inputs:
+- Tool/resource/prompt capability to expose.
+- Runtime, transport, SDK language/version, auth, rate/cost, and deployment constraints.
+
+Outputs:
+- MCP server shape, schemas, transport choice, and implementation plan or patch.
+- Tool/resource descriptions with input and output contracts.
+- Verification steps for local client connection and handler behavior.
+
+Verification:
+- Check current SDK docs before relying on method signatures.
+- Keep business logic transport-independent and validate every tool input.
 
 ## When to Use
 

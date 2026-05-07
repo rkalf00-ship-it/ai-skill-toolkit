@@ -62,7 +62,7 @@
       "path": "frontend-patterns",
       "category": "architecture",
       "priority": 70,
-      "primary_when": ["React component", "custom hook", "useState", "useEffect", "code splitting"],
+      "primary_when": ["React component", "custom hook", "useState", "useEffect", "React code splitting"],
       "conflicts_with": ["backend-patterns"],
       "pairs_with": ["ui-ux-pro-max", "e2e-testing"]
     },

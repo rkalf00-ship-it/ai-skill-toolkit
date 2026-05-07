@@ -25,12 +25,26 @@ triggers:
     - frontend animation
     - code style
 requires:
-  os: [windows, macos, linux]
 ---
 
 # Security Review Skill
 
 This skill ensures all code follows security best practices and identifies potential vulnerabilities.
+
+## Contract
+
+Inputs:
+- Feature, diff, endpoint, data flow, or subsystem to review.
+- Auth model, trust boundaries, sensitive data, and deployment context.
+
+Outputs:
+- Findings ordered by severity with file/line evidence when available.
+- Required fixes, verification steps, and residual risks.
+- Security checklist result for relevant categories only.
+
+Verification:
+- Prefer concrete code evidence over generic advice.
+- Check secrets, validation, authorization, injection, XSS/CSRF, rate limits, logging, and dependency risks as applicable.
 
 ## When to Activate
 
