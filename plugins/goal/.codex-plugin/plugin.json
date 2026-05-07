@@ -1,0 +1,42 @@
+{
+  "$schema": "../../_schema/plugin.schema.json",
+  "name": "goal",
+  "version": "0.1.0",
+  "description": "Goal-based execution workflow for AI Skill Toolkit. Provides the /goal command to define success criteria, route to the right skills, execute a focused improvement loop, and verify the result.",
+  "author": {
+    "name": "AI Skill Toolkit"
+  },
+  "homepage": "https://github.com/rkalf00-ship-it/ai-skill-toolkit",
+  "repository": "https://github.com/rkalf00-ship-it/ai-skill-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "goal",
+    "workflow",
+    "skills",
+    "routing",
+    "verification"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Goal Workflow",
+    "shortDescription": "Run goal-based skill routing",
+    "longDescription": "Goal Workflow turns broad requests into bounded work: success criteria, skill routing, focused execution, verification evidence, and remaining risks.",
+    "developerName": "AI Skill Toolkit",
+    "category": "Engineering",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/rkalf00-ship-it/ai-skill-toolkit",
+    "privacyPolicyURL": "https://github.com/rkalf00-ship-it/ai-skill-toolkit",
+    "termsOfServiceURL": "https://github.com/rkalf00-ship-it/ai-skill-toolkit",
+    "defaultPrompt": [
+      "/goal Improve this project",
+      "/goal Add a secure feature with tests",
+      "/goal Review and verify before PR"
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}

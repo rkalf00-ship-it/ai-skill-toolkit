@@ -2,30 +2,36 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/ai-skill-toolkit/skills/_schema/SKILL.schema.json",
   "title": "AI Skill Toolkit SKILL.md frontmatter",
-  "description": "Superset of the Anthropic Skills format. Only `name` and `description` are required by the official format and by this schema. The additional fields (`id`, `category`, `version`, `triggers`, `requires`) are toolkit-specific recommendations enforced by `scripts/validate-skills.ps1 -Strict`. Unknown top-level fields are allowed (e.g. legacy `origin`).",
+  "description": "Strict frontmatter schema for SKILL.md. 'name' is the dispatcher slug (kebab-case, equals folder/id). 'displayName' is the human-readable label. triggers.positive MUST be a superset of the matching manifest entry's primary_when.",
   "type": "object",
   "additionalProperties": true,
-  "required": ["name", "description"],
+  "required": ["name", "id", "description", "category", "version", "triggers", "requires"],
   "properties": {
     "name": {
       "type": "string",
+      "minLength": 2,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
+      "description": "Dispatcher slug. MUST be kebab-case and MUST equal both 'id' and the parent folder name."
+    },
+    "displayName": {
+      "type": "string",
       "minLength": 1,
       "maxLength": 64,
-      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9 _-]*$",
-      "description": "Human-readable skill name. Required by the Anthropic Skills format."
+      "description": "Human-readable label shown in UIs (optional). Example: 'API Design'."
     },
     "description": {
       "type": "string",
       "minLength": 10,
       "maxLength": 1024,
-      "description": "Activation summary used by skill dispatchers. ≤1024 characters. Required by the Anthropic Skills format. Should contain trigger phrases and (when relevant) skip conditions; offload long enumerations to `triggers.positive`."
+      "description": "Activation summary used by skill dispatchers. Should contain trigger phrases and (when relevant) skip conditions; offload long enumerations to `triggers.positive`."
     },
     "id": {
       "type": "string",
       "minLength": 2,
       "maxLength": 64,
       "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
-      "description": "Stable kebab-case identifier. Must equal the parent folder name."
+      "description": "Stable kebab-case identifier. MUST equal 'name' and the parent folder name."
     },
     "category": {
       "type": "string",
@@ -35,21 +41,24 @@
     "version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[A-Za-z0-9.-]+)?(?:\\+[A-Za-z0-9.-]+)?$",
-      "description": "Semantic version of this skill definition (not the toolkit)."
+      "description": "Semver of this skill definition. 0.x = preview, >=1.0.0 = stable."
     },
     "triggers": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["positive"],
+      "required": ["positive", "negative"],
       "properties": {
         "positive": {
           "type": "array",
           "minItems": 1,
+          "uniqueItems": true,
           "items": { "type": "string", "minLength": 2 },
-          "description": "Phrases or keywords that should activate this skill."
+          "description": "Phrases or keywords that should activate this skill. MUST be a superset of the matching manifest entry's primary_when."
         },
         "negative": {
           "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
           "items": { "type": "string", "minLength": 2 },
           "description": "Phrases or keywords that should suppress activation, even if positive triggers also match."
         }
@@ -62,21 +71,31 @@
       "properties": {
         "mcp": {
           "type": "array",
+          "uniqueItems": true,
           "items": { "type": "string", "minLength": 1 },
           "description": "MCP servers the skill depends on (e.g. firecrawl, exa, context7). The skill should fail gracefully if any are missing."
         },
         "os": {
           "type": "array",
+          "uniqueItems": true,
           "items": { "type": "string", "enum": ["windows", "macos", "linux"] },
-          "description": "Supported operating systems. Empty or unset = all."
+          "description": "Supported operating systems. Omit this field to mean all OSes — do NOT redundantly list [windows, macos, linux]."
         },
         "bin": {
           "type": "array",
+          "uniqueItems": true,
           "items": { "type": "string", "minLength": 1 },
           "description": "External executables required on PATH (e.g. python3, node, git)."
         }
       },
-      "description": "Hard dependencies. The validator does not check actual availability — it only checks the declaration shape."
+      "description": "Hard dependencies. The validator does not check actual availability; it only checks the declaration shape."
     }
-  }
+  },
+  "allOf": [
+    {
+      "description": "id MUST equal name (enforced by validator at cross-field check time).",
+      "if":   { "properties": { "id":   { "type": "string" } }, "required": ["id"] },
+      "then": { "properties": { "name": { "type": "string" } }, "required": ["name"] }
+    }
+  ]
 }

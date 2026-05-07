@@ -6,6 +6,12 @@ This project uses two governance modes.
 
 For everyday work the agent operates under `README.md` Karpathy Guidelines. No mandatory pipeline.
 
+## Goal Workflow
+
+When the user starts with `/goal` or explicitly asks to use the goal workflow, follow `.agents/commands/goal.md`.
+
+The goal workflow is lighter than the multi-role pipeline. It should select one primary skill from `.agents/skills/manifest.json` in installed projects or `skills/manifest.json` inside this toolkit repository, add only necessary companion skills, define verifiable success criteria, execute a small loop, and report verification evidence.
+
 ## Opt-in: Multi-Role Pipeline
 
 The strict multi-role execution system activates **only** when the user triggers it explicitly via:

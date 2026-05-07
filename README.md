@@ -7,6 +7,7 @@ Reusable AI development skill system for Codex / Claude / Antigravity.
 Two modes:
 
 - **Default** - [Karpathy Guidelines](#karpathy-guidelines) (lightweight). No mandatory pipeline.
+- **Goal** - `/goal <objective>` creates success criteria, routes to a primary skill from `skills/manifest.json`, adds only necessary companion skills, executes, and verifies.
 - **Opt-in** - Multi-Role Pipeline (`planner -> architect -> engineer -> reviewer -> tester -> documenter`). Activates only when explicitly triggered by one of: `/multirole`, `full pipeline`, `formal process`, `multi-role`.
 
 See [`AGENTS.md`](AGENTS.md) for full activation rules and pipeline file references.
@@ -81,6 +82,22 @@ powershell -ExecutionPolicy Bypass -File "scripts/install-to-project.ps1" -Proje
 ```
 
 Skills are copied once into `.agents/skills`. `.claude/skills` and `.codex/skills` are created as directory junctions pointing to that single source, so editing a skill in any of the three locations updates all of them.
+
+The curated skill list is read from `skills/manifest.json` in this repository and installed to `.agents/skills/manifest.json` in target projects. Adding a skill requires updating the manifest instead of editing the installer script.
+
+Use the goal workflow in a target project:
+
+```text
+/goal Improve this codebase as a reusable AI-assisted development workspace.
+```
+
+In Codex CLI, `/goal` requires the under-development `goals` feature flag:
+
+```powershell
+codex features enable goals
+```
+
+Restart Codex after enabling it. If `/goal` is still unavailable in your Codex surface, use the installed goal workflow skill instead by asking for "goal workflow: <objective>" or explicitly loading `goal` with `/use goal`.
 
 Optional switches:
 

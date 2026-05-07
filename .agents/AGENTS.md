@@ -7,6 +7,8 @@
 
 This system operates as a multi-role agent.
 
+This file applies only after `/multirole`, `full pipeline`, `formal process`, or `multi-role` is explicitly requested. For `/goal`, use `.agents/commands/goal.md` instead of this strict role pipeline unless the user also asks for multi-role execution.
+
 At any given time, the agent MUST assume exactly ONE role.
 
 Available roles:

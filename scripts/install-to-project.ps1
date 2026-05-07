@@ -11,25 +11,9 @@ $ErrorActionPreference = "Stop"
 
 $SkillRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $CuratedSkillPath = Join-Path $SkillRoot "skills"
+$ManifestPath = Join-Path $CuratedSkillPath "manifest.json"
 $AgentsSourcePath = Join-Path $SkillRoot ".agents"
 $TargetProject = (Resolve-Path -LiteralPath $ProjectPath).Path
-
-$ExpectedSkills = @(
-  "api-design",
-  "backend-patterns",
-  "codebase-onboarding",
-  "deep-research",
-  "documentation-lookup",
-  "e2e-testing",
-  "frontend-patterns",
-  "git-workflow",
-  "mcp-server-patterns",
-  "repo-scan",
-  "security-review",
-  "tdd-workflow",
-  "ui-ux-pro-max",
-  "verification-loop"
-)
 
 # Skills that ship asset directories beyond SKILL.md.
 # Each listed entry MUST be a non-empty directory. A plain file at the path
@@ -42,13 +26,66 @@ if (-not (Test-Path -LiteralPath $CuratedSkillPath)) {
   throw "Curated skills folder not found: $CuratedSkillPath"
 }
 
+if (-not (Test-Path -LiteralPath $ManifestPath)) {
+  throw "Skill manifest not found: $ManifestPath"
+}
+
 if (-not (Test-Path -LiteralPath $AgentsSourcePath)) {
   throw "Toolkit .agents folder not found: $AgentsSourcePath"
 }
 
+$Manifest = Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json
+$ExpectedSkills = @($Manifest.skills | ForEach-Object { $_.id })
+
+function Copy-ToolkitDirectory {
+  param(
+    [Parameter(Mandatory=$true)]
+    [string]$Source,
+
+    [Parameter(Mandatory=$true)]
+    [string]$Destination
+  )
+
+  $ExcludedDirectoryNames = @('__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'node_modules')
+  $ExcludedFileNames = @('.DS_Store', 'Thumbs.db')
+  $ExcludedFileExtensions = @('.pyc', '.pyo')
+
+  if (Test-Path -LiteralPath $Destination) {
+    Remove-Item -LiteralPath $Destination -Recurse -Force
+  }
+
+  New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+
+  foreach ($Item in (Get-ChildItem -LiteralPath $Source -Recurse -Force)) {
+    $relativePath = $Item.FullName.Substring($Source.Length).TrimStart('\','/')
+    if (-not $relativePath) { continue }
+
+    $parts = $relativePath -split '[\\/]'
+    if (@($parts | Where-Object { $_ -in $ExcludedDirectoryNames }).Count -gt 0) {
+      continue
+    }
+
+    if (-not $Item.PSIsContainer) {
+      if ($Item.Name -in $ExcludedFileNames) { continue }
+      if ($Item.Extension -in $ExcludedFileExtensions) { continue }
+    }
+
+    $targetPath = Join-Path $Destination $relativePath
+    if ($Item.PSIsContainer) {
+      New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
+    } else {
+      $targetParent = Split-Path -Parent $targetPath
+      New-Item -ItemType Directory -Force -Path $targetParent | Out-Null
+      Copy-Item -LiteralPath $Item.FullName -Destination $targetPath -Force
+    }
+  }
+}
+
 $Skills = @()
-foreach ($SkillName in $ExpectedSkills) {
-  $SkillPath = Join-Path $CuratedSkillPath $SkillName
+foreach ($SkillSpec in @($Manifest.skills)) {
+  $SkillName = $SkillSpec.id
+  $SkillRelativePath = if ($SkillSpec.path) { $SkillSpec.path } else { $SkillName }
+  $SkillPath = Join-Path $CuratedSkillPath $SkillRelativePath
   $SkillFile = Join-Path $SkillPath "SKILL.md"
   if (-not (Test-Path -LiteralPath $SkillFile)) {
     throw "Expected curated skill is missing SKILL.md: $SkillName"
@@ -98,8 +135,9 @@ Write-Host "Curated skills: $($Skills.Count)"
 # Single source of truth: copy skills only into .agents/skills
 New-Item -ItemType Directory -Force -Path $PrimarySkillDestination | Out-Null
 foreach ($Skill in $Skills) {
-  Copy-Item -LiteralPath $Skill.FullName -Destination $PrimarySkillDestination -Recurse -Force
+  Copy-ToolkitDirectory -Source $Skill.FullName -Destination (Join-Path $PrimarySkillDestination $Skill.Name)
 }
+Copy-Item -LiteralPath $ManifestPath -Destination $PrimarySkillDestination -Force
 Write-Host "Installed skills to: $PrimarySkillDestination"
 
 # .claude/skills and .codex/skills are directory junctions to .agents/skills
@@ -130,14 +168,22 @@ foreach ($JunctionPath in $JunctionSkillDestinations) {
 
 $AgentsRulesSource = Join-Path $AgentsSourcePath "rules"
 $AgentsRolesSource = Join-Path $AgentsSourcePath "roles"
+$AgentsCommandsSource = Join-Path $AgentsSourcePath "commands"
+$AgentsPluginsSource = Join-Path $AgentsSourcePath "plugins"
 $AgentsAgentsSource = Join-Path $AgentsSourcePath "AGENTS.md"
+$PluginsSource = Join-Path $SkillRoot "plugins"
 
 $AgentsRulesTarget = Join-Path $TargetProject ".agents\rules"
 $AgentsRolesTarget = Join-Path $TargetProject ".agents\roles"
+$AgentsCommandsTarget = Join-Path $TargetProject ".agents\commands"
+$AgentsPluginsTarget = Join-Path $TargetProject ".agents\plugins"
 $AgentsAgentsTarget = Join-Path $TargetProject ".agents\AGENTS.md"
+$PluginsTarget = Join-Path $TargetProject "plugins"
 
 New-Item -ItemType Directory -Force -Path $AgentsRulesTarget | Out-Null
 New-Item -ItemType Directory -Force -Path $AgentsRolesTarget | Out-Null
+New-Item -ItemType Directory -Force -Path $AgentsCommandsTarget | Out-Null
+New-Item -ItemType Directory -Force -Path $AgentsPluginsTarget | Out-Null
 
 if (Test-Path -LiteralPath $AgentsRulesSource) {
   Get-ChildItem -LiteralPath $AgentsRulesSource | ForEach-Object {
@@ -155,6 +201,38 @@ if (Test-Path -LiteralPath $AgentsRolesSource) {
   Write-Host "Installed multi-role roles to: $AgentsRolesTarget"
 } else {
   Write-Host "Skipped missing source: $AgentsRolesSource"
+}
+
+if (Test-Path -LiteralPath $AgentsCommandsSource) {
+  Get-ChildItem -LiteralPath $AgentsCommandsSource | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination $AgentsCommandsTarget -Recurse -Force
+  }
+  Write-Host "Installed commands to: $AgentsCommandsTarget"
+} else {
+  Write-Host "Skipped missing source: $AgentsCommandsSource"
+}
+
+if (Test-Path -LiteralPath $AgentsPluginsSource) {
+  Get-ChildItem -LiteralPath $AgentsPluginsSource | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination $AgentsPluginsTarget -Recurse -Force
+  }
+  Write-Host "Installed plugin marketplace to: $AgentsPluginsTarget"
+} else {
+  Write-Host "Skipped missing source: $AgentsPluginsSource"
+}
+
+if (Test-Path -LiteralPath $PluginsSource) {
+  New-Item -ItemType Directory -Force -Path $PluginsTarget | Out-Null
+  Get-ChildItem -LiteralPath $PluginsSource | ForEach-Object {
+    if ($_.PSIsContainer) {
+      Copy-ToolkitDirectory -Source $_.FullName -Destination (Join-Path $PluginsTarget $_.Name)
+    } else {
+      Copy-Item -LiteralPath $_.FullName -Destination $PluginsTarget -Force
+    }
+  }
+  Write-Host "Installed plugins to: $PluginsTarget"
+} else {
+  Write-Host "Skipped missing source: $PluginsSource"
 }
 
 $PolicyFiles = @(

@@ -1,3 +1,7 @@
 repos/
 .claude/
 .codex/
+__pycache__/
+*.pyc
+!plugins/
+!plugins/**

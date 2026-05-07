@@ -1,0 +1,133 @@
+{
+  "$schema": "./_schema/skills.manifest.schema.json",
+  "version": "1.0.0",
+  "description": "Curated skill routing manifest for AI Skill Toolkit.",
+  "skills": [
+    {
+      "id": "api-design",
+      "path": "api-design",
+      "category": "architecture",
+      "priority": 80,
+      "primary_when": ["REST API", "endpoint design", "status code", "pagination", "API versioning"],
+      "conflicts_with": ["backend-patterns"],
+      "pairs_with": ["security-review", "tdd-workflow"]
+    },
+    {
+      "id": "backend-patterns",
+      "path": "backend-patterns",
+      "category": "architecture",
+      "priority": 70,
+      "primary_when": ["service layer", "repository pattern", "database optimization", "caching", "background jobs"],
+      "conflicts_with": ["api-design", "frontend-patterns", "ui-ux-pro-max"],
+      "pairs_with": ["security-review", "verification-loop"]
+    },
+    {
+      "id": "codebase-onboarding",
+      "path": "codebase-onboarding",
+      "category": "research",
+      "priority": 75,
+      "primary_when": ["onboard me", "understand this codebase", "generate CLAUDE.md", "new repo", "joining a team"],
+      "conflicts_with": ["deep-research"],
+      "pairs_with": ["repo-scan"]
+    },
+    {
+      "id": "deep-research",
+      "path": "deep-research",
+      "category": "research",
+      "priority": 65,
+      "primary_when": ["research", "deep dive", "competitive analysis", "due diligence", "cited report"],
+      "conflicts_with": ["codebase-onboarding"],
+      "pairs_with": ["documentation-lookup"]
+    },
+    {
+      "id": "documentation-lookup",
+      "path": "documentation-lookup",
+      "category": "research",
+      "priority": 85,
+      "primary_when": ["library docs", "API reference", "framework setup", "latest version", "how to use"],
+      "conflicts_with": [],
+      "pairs_with": ["deep-research", "mcp-server-patterns"]
+    },
+    {
+      "id": "e2e-testing",
+      "path": "e2e-testing",
+      "category": "quality",
+      "priority": 70,
+      "primary_when": ["Playwright", "E2E test", "browser automation", "flaky test"],
+      "conflicts_with": [],
+      "pairs_with": ["verification-loop", "frontend-patterns", "ui-ux-pro-max"]
+    },
+    {
+      "id": "frontend-patterns",
+      "path": "frontend-patterns",
+      "category": "architecture",
+      "priority": 70,
+      "primary_when": ["React component", "custom hook", "useState", "useEffect", "code splitting"],
+      "conflicts_with": ["backend-patterns"],
+      "pairs_with": ["ui-ux-pro-max", "e2e-testing"]
+    },
+    {
+      "id": "git-workflow",
+      "path": "git-workflow",
+      "category": "workflow",
+      "priority": 60,
+      "primary_when": ["branching strategy", "commit message", "merge vs rebase", "PR description", "git tag"],
+      "conflicts_with": [],
+      "pairs_with": []
+    },
+    {
+      "id": "mcp-server-patterns",
+      "path": "mcp-server-patterns",
+      "category": "architecture",
+      "priority": 75,
+      "primary_when": ["MCP server", "MCP tool", "MCP resource", "stdio transport", "Streamable HTTP"],
+      "conflicts_with": [],
+      "pairs_with": ["documentation-lookup", "security-review"]
+    },
+    {
+      "id": "repo-scan",
+      "path": "repo-scan",
+      "category": "research",
+      "priority": 55,
+      "primary_when": ["legacy codebase", "third-party audit", "dead code inventory", "monorepo audit"],
+      "conflicts_with": [],
+      "pairs_with": ["codebase-onboarding"]
+    },
+    {
+      "id": "security-review",
+      "path": "security-review",
+      "category": "quality",
+      "priority": 90,
+      "primary_when": ["authentication", "authorization", "secrets management", "payment feature", "sensitive data", "file upload"],
+      "conflicts_with": [],
+      "pairs_with": ["api-design", "backend-patterns", "verification-loop", "mcp-server-patterns"]
+    },
+    {
+      "id": "tdd-workflow",
+      "path": "tdd-workflow",
+      "category": "quality",
+      "priority": 65,
+      "primary_when": ["TDD", "test-driven", "write tests first", "reproducer test", "test coverage"],
+      "conflicts_with": [],
+      "pairs_with": ["verification-loop", "api-design"]
+    },
+    {
+      "id": "ui-ux-pro-max",
+      "path": "ui-ux-pro-max",
+      "category": "design",
+      "priority": 85,
+      "primary_when": ["design system", "color palette", "typography", "accessibility review", "component design", "responsive layout"],
+      "conflicts_with": ["backend-patterns"],
+      "pairs_with": ["frontend-patterns", "e2e-testing"]
+    },
+    {
+      "id": "verification-loop",
+      "path": "verification-loop",
+      "category": "quality",
+      "priority": 50,
+      "primary_when": ["verify before PR", "build check", "type check", "quality gate", "ready to ship"],
+      "conflicts_with": [],
+      "pairs_with": ["backend-patterns", "tdd-workflow", "e2e-testing", "security-review"]
+    }
+  ]
+}

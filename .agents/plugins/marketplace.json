@@ -1,0 +1,21 @@
+{
+  "$schema": "../../plugins/_schema/marketplace.schema.json",
+  "name": "ai-skill-toolkit",
+  "interface": {
+    "displayName": "AI Skill Toolkit"
+  },
+  "plugins": [
+    {
+      "name": "goal",
+      "source": {
+        "source": "local",
+        "path": "./plugins/goal"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Engineering"
+    }
+  ]
+}

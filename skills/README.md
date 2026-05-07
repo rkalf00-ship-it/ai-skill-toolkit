@@ -3,6 +3,8 @@
 This folder contains the small, portable skill set selected from the larger `repos/`
 catalog for real project use.
 
+`manifest.json` is the source of truth for curated skill installation and goal-based routing.
+
 ## Selection Rules
 
 - Exclude documentation examples and localized docs.

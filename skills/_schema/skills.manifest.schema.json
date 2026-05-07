@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ai-skill-toolkit/skills/_schema/skills.manifest.schema.json",
+  "title": "AI Skill Toolkit manifest",
+  "description": "Routing manifest. Cross-file invariant: every primary_when string MUST appear (case-insensitive substring match) in the corresponding SKILL.md triggers.positive. Cross-entry invariant: pairs_with and conflicts_with are symmetric (if A->B then B->A).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "skills"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": { "type": "string" },
+    "skills": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "category", "priority", "primary_when", "conflicts_with", "pairs_with"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
+            "description": "Folder name relative to skills/. MUST equal id."
+          },
+          "category": {
+            "type": "string",
+            "enum": ["architecture", "workflow", "quality", "research", "design", "infra"]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "primary_when": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 2 },
+            "description": "MUST be a subset of SKILL.triggers.positive (case-insensitive substring match)."
+          },
+          "conflicts_with": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$" },
+            "description": "Symmetric: if A lists B here, B MUST list A."
+          },
+          "pairs_with": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$" },
+            "description": "Symmetric: if A lists B here, B MUST list A."
+          }
+        }
+      }
+    }
+  }
+}
