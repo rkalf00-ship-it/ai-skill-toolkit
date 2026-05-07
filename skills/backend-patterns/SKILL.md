@@ -1,7 +1,30 @@
 ---
 name: backend-patterns
+id: backend-patterns
 description: Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.
-origin: ECC
+category: architecture
+version: 1.0.0
+triggers:
+  positive:
+    - repository pattern
+    - service layer
+    - middleware
+    - N+1 query
+    - database optimization
+    - caching
+    - Redis
+    - JWT
+    - RBAC
+    - background jobs
+    - structured logging
+    - rate limiter
+  negative:
+    - REST URL design
+    - frontend component
+    - UI styling
+    - mobile layout
+requires:
+  os: [windows, macos, linux]
 ---
 
 # Backend Development Patterns

@@ -1,7 +1,26 @@
 ---
 name: repo-scan
+id: repo-scan
 description: Cross-stack source code asset audit - classifies every file, detects embedded third-party libraries, and delivers actionable four-level verdicts per module with interactive HTML reports.
-origin: community
+category: research
+version: 1.0.0
+triggers:
+  positive:
+    - legacy codebase
+    - structural overview
+    - third-party audit
+    - file classification
+    - monorepo audit
+    - embedded library detection
+    - vendored dependencies
+    - dead code inventory
+  negative:
+    - small project
+    - single-file script
+    - new project from scratch
+requires:
+  os: [windows, macos, linux]
+  bin: [git]
 ---
 
 # repo-scan

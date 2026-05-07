@@ -1,7 +1,26 @@
 ---
 name: api-design
+id: api-design
 description: REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs.
-origin: ECC
+category: architecture
+version: 1.0.0
+triggers:
+  positive:
+    - REST API
+    - endpoint design
+    - status code
+    - pagination
+    - rate limiting
+    - API versioning
+    - error response
+    - resource naming
+    - HTTP method
+  negative:
+    - GraphQL schema only
+    - gRPC service
+    - internal RPC
+requires:
+  os: [windows, macos, linux]
 ---
 
 # API Design Patterns

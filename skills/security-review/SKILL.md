@@ -1,7 +1,31 @@
 ---
 name: security-review
-description: Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.
-origin: ECC
+id: security-review
+description: Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns. See references/cloud-infrastructure.md for cloud and CI/CD security.
+category: quality
+version: 1.0.0
+triggers:
+  positive:
+    - authentication
+    - authorization
+    - secrets management
+    - API endpoint security
+    - payment feature
+    - sensitive data
+    - OWASP
+    - XSS
+    - SQL injection
+    - CSRF
+    - Row Level Security
+    - input validation
+    - file upload
+    - JWT
+  negative:
+    - UI design
+    - frontend animation
+    - code style
+requires:
+  os: [windows, macos, linux]
 ---
 
 # Security Review Skill

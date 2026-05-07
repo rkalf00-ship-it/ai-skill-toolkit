@@ -1,7 +1,25 @@
 ---
 name: verification-loop
-description: "A comprehensive verification system for Claude Code sessions."
-origin: ECC
+id: verification-loop
+description: A comprehensive verification system for Claude Code sessions covering build, types, lint, tests, security scan, and diff review. Use after completing a feature, before creating a PR, or when ensuring quality gates pass.
+category: quality
+version: 1.0.0
+triggers:
+  positive:
+    - verify before PR
+    - build check
+    - type check
+    - lint check
+    - run tests
+    - pre-deploy verification
+    - ready to ship
+    - quality gate
+  negative:
+    - feature design
+    - planning
+    - architecture decision
+requires:
+  os: [windows, macos, linux]
 ---
 
 # Verification Loop Skill

@@ -1,7 +1,31 @@
 ---
 name: frontend-patterns
+id: frontend-patterns
 description: Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.
-origin: ECC
+category: architecture
+version: 1.0.0
+triggers:
+  positive:
+    - React component
+    - useState
+    - useEffect
+    - custom hook
+    - virtualization
+    - code splitting
+    - error boundary
+    - framer-motion
+    - controlled form
+    - keyboard navigation
+    - render props
+    - compound component
+  negative:
+    - backend
+    - API endpoint
+    - database query
+    - server-side
+    - infrastructure
+requires:
+  os: [windows, macos, linux]
 ---
 
 # Frontend Development Patterns

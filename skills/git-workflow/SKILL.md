@@ -1,7 +1,29 @@
 ---
 name: git-workflow
+id: git-workflow
 description: Git workflow patterns including branching strategies, commit conventions, merge vs rebase, conflict resolution, and collaborative development best practices for teams of all sizes.
-origin: ECC
+category: workflow
+version: 1.0.0
+triggers:
+  positive:
+    - branching strategy
+    - commit message
+    - GitHub Flow
+    - GitFlow
+    - trunk-based
+    - merge vs rebase
+    - PR description
+    - conflict resolution
+    - semantic versioning
+    - git tag
+    - changelog
+  negative:
+    - feature implementation
+    - business logic
+    - UI design
+requires:
+  os: [windows, macos, linux]
+  bin: [git]
 ---
 
 # Git Workflow Patterns

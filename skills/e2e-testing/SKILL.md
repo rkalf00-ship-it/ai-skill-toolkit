@@ -1,7 +1,27 @@
 ---
 name: e2e-testing
+id: e2e-testing
 description: Playwright E2E testing patterns, Page Object Model, configuration, CI/CD integration, artifact management, and flaky test strategies.
-origin: ECC
+category: quality
+version: 1.0.0
+triggers:
+  positive:
+    - Playwright
+    - E2E test
+    - end-to-end test
+    - page object model
+    - browser automation
+    - flaky test
+    - test artifacts
+    - test screenshot
+    - test video
+  negative:
+    - unit test only
+    - integration test only
+    - API test only
+requires:
+  os: [windows, macos, linux]
+  bin: [node]
 ---
 
 # E2E Testing Patterns

@@ -1,7 +1,26 @@
 ---
 name: codebase-onboarding
+id: codebase-onboarding
 description: Analyze an unfamiliar codebase and generate a structured onboarding guide with architecture map, key entry points, conventions, and a starter CLAUDE.md. Use when joining a new project or setting up Claude Code for the first time in a repo.
-origin: ECC
+category: research
+version: 1.0.0
+triggers:
+  positive:
+    - onboard me
+    - walk me through this repo
+    - understand this codebase
+    - generate CLAUDE.md
+    - new repo
+    - new project
+    - joining a team
+    - help me understand this codebase
+  negative:
+    - refactor
+    - fix bug
+    - add feature
+    - implement
+requires:
+  os: [windows, macos, linux]
 ---
 
 # Codebase Onboarding

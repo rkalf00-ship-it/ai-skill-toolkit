@@ -1,7 +1,26 @@
 ---
 name: tdd-workflow
+id: tdd-workflow
 description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
-origin: ECC
+category: quality
+version: 1.0.0
+triggers:
+  positive:
+    - TDD
+    - test-driven
+    - write tests first
+    - RED green refactor
+    - test coverage
+    - failing test
+    - reproducer test
+    - bug fix with tests
+  negative:
+    - prototype
+    - exploration
+    - PoC
+    - throwaway script
+requires:
+  os: [windows, macos, linux]
 ---
 
 # Test-Driven Development Workflow
