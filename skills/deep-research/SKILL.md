@@ -1,9 +1,9 @@
 ---
 name: deep-research
 id: deep-research
-description: Multi-source deep research using firecrawl and exa MCPs. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations.
+description: Use for thorough multi-source research with citations — competitive analysis, technology evaluation, market sizing, due diligence, current state of a topic. Uses firecrawl / exa MCPs when available, falls back to web-search or user-provided sources. Activates on research, deep dive, investigate, current state of, market sizing, competitive analysis, due diligence, cited report. Skip for codebase questions (use codebase-onboarding) or implementation tasks.
 category: research
-version: 1.0.0
+version: 1.1.0
 triggers:
   positive:
     - research
@@ -24,12 +24,12 @@ requires:
 
 # Deep Research
 
-Produce thorough, cited research reports from multiple web sources using firecrawl and exa MCP tools.
+Produce thorough, cited research reports from multiple web sources.
 
 ## When to Activate
 
 - User asks to research any topic in depth
-- Competitive analysis, technology evaluation, or market sizing
+- Competitive analysis, technology evaluation, market sizing
 - Due diligence on companies, investors, or technologies
 - Any question requiring synthesis from multiple sources
 - User says "research", "deep dive", "investigate", or "what's the current state of"
@@ -38,159 +38,60 @@ Produce thorough, cited research reports from multiple web sources using firecra
 
 Inputs:
 - Research topic or decision question.
-- Desired depth, audience, recency window, and source constraints when provided.
-- Any sources, domains, jurisdictions, or competitors that must be included or excluded.
+- Desired depth, audience, recency window, source constraints when provided.
+- Sources, domains, jurisdictions, or competitors that must be included or excluded.
 
 Outputs:
-- Cited research report with executive summary, themes, key takeaways, sources, and methodology.
+- Cited research report with executive summary, themes, key takeaways, sources, methodology.
 - Clear distinction between sourced facts, estimates, and model inference.
 - Explicit uncertainty notes for thin or conflicting evidence.
 
 Verification:
 - Use at least two independent sources for important claims when the topic allows it.
 - Include source attribution for factual claims that are not common knowledge.
-- State the search/read methodology and any source access limitations.
+- State the search / read methodology and any source access limitations.
 
 Failure mode:
-- If firecrawl/exa MCP tools are unavailable, use the fallback ladder below.
-- Never fabricate sources, citations, publication dates, or source quotes.
+- If firecrawl / exa MCP tools are unavailable, use the fallback ladder below.
+- Never fabricate sources, citations, publication dates, or quotes.
 - If no current-source access is available, stop and state that current-source
   research cannot be completed in this environment.
 
 Fallback ladder:
 1. Use any configured research MCPs named by the host environment.
-2. Use the host's approved web/search/browse tool, restricted by the user's source,
-   date, domain, and jurisdiction constraints.
+2. Use the host's approved web / search / browse tool, restricted by user's
+   source, date, domain, jurisdiction constraints.
 3. Use user-provided URLs, PDFs, repository files, or pasted source text.
 4. If none of the above exists, ask for sources or permission to enable a search tool.
 
 Fallback output requirements:
 - Label the methodology as `MCP research`, `web-search fallback`,
   `user-provided source review`, or `blocked`.
-- Cite every non-obvious factual claim to a source URL/title when source access is available.
+- Cite every non-obvious factual claim to a source URL / title when source access is available.
 - State source limitations before recommendations when the evidence base is thin.
 
 ## MCP Requirements
 
 At least one of:
-- **firecrawl** - `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`
-- **exa** - `web_search_exa`, `web_search_advanced_exa`, `crawling_exa`
+- **firecrawl** — `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`
+- **exa** — `web_search_exa`, `web_search_advanced_exa`, `crawling_exa`
 
-Both together give the best coverage. Configure in `~/.claude.json` or `~/.codex/config.toml`.
-These MCPs are preferred tools, not hard requirements, because the fallback policy
-above defines how to proceed when they are missing.
+Both together give the best coverage. Configure in `~/.claude.json` or
+`~/.codex/config.toml`. These MCPs are *preferred* tools, not hard
+requirements — the fallback policy above defines how to proceed when missing.
 
-## Workflow
+## Workflow Summary
 
-### Step 1: Understand the Goal
+| Step | Goal | Reference |
+|------|------|-----------|
+| 1 | Understand the goal (1–2 clarifying questions max) | `references/workflow.md` |
+| 2 | Plan: break topic into 3–5 sub-questions | `references/workflow.md` |
+| 3 | Multi-source search (15–30 sources, 2–3 keyword variations per sub-question) | `references/workflow.md` |
+| 4 | Deep-read 3–5 key sources in full (don't rely on snippets) | `references/workflow.md` |
+| 5 | Synthesize and write report | `references/report-template.md` |
+| 6 | Deliver (chat for short, file for long) | `references/workflow.md` |
 
-Ask 1-2 quick clarifying questions:
-- "What's your goal - learning, making a decision, or writing something?"
-- "Any specific angle or depth you want?"
-
-If the user says "just research it" - skip ahead with reasonable defaults.
-
-### Step 2: Plan the Research
-
-Break the topic into 3-5 research sub-questions. Example:
-- Topic: "Impact of AI on healthcare"
-  - What are the main AI applications in healthcare today?
-  - What clinical outcomes have been measured?
-  - What are the regulatory challenges?
-  - What companies are leading this space?
-  - What's the market size and growth trajectory?
-
-### Step 3: Execute Multi-Source Search
-
-For EACH sub-question, search using the best available source-access path from
-the MCP requirements or fallback ladder:
-
-**With firecrawl:**
-```
-firecrawl_search(query: "<sub-question keywords>", limit: 8)
-```
-
-**With exa:**
-```
-web_search_exa(query: "<sub-question keywords>", numResults: 8)
-web_search_advanced_exa(query: "<keywords>", numResults: 5, startPublishedDate: "2025-01-01")
-```
-
-**Search strategy:**
-- Use 2-3 different keyword variations per sub-question
-- Mix general and news-focused queries
-- Aim for 15-30 unique sources total
-- Prioritize: academic, official, reputable news > blogs > forums
-
-### Step 4: Deep-Read Key Sources
-
-For the most promising URLs, fetch full content:
-
-**With firecrawl:**
-```
-firecrawl_scrape(url: "<url>")
-```
-
-**With exa:**
-```
-crawling_exa(url: "<url>", tokensNum: 5000)
-```
-
-Read 3-5 key sources in full for depth. Do not rely only on search snippets.
-
-### Step 5: Synthesize and Write Report
-
-Structure the report:
-
-```markdown
-# [Topic]: Research Report
-*Generated: [date] | Sources: [N] | Confidence: [High/Medium/Low]*
-
-## Executive Summary
-[3-5 sentence overview of key findings]
-
-## 1. [First Major Theme]
-[Findings with inline citations]
-- Key point (Source Name: `<source-url>`)
-- Supporting data (Source Name: `<source-url>`)
-
-## 2. [Second Major Theme]
-...
-
-## 3. [Third Major Theme]
-...
-
-## Key Takeaways
-- [Actionable insight 1]
-- [Actionable insight 2]
-- [Actionable insight 3]
-
-## Sources
-1. Title - `<source-url>` - one-line summary
-2. ...
-
-## Methodology
-Searched [N] queries across web and news. Analyzed [M] sources.
-Sub-questions investigated: [list]
-```
-
-### Step 6: Deliver
-
-- **Short topics**: Post the full report in chat
-- **Long reports**: Post the executive summary + key takeaways, save full report to a file
-
-## Parallel Research with Subagents
-
-For broad topics, use Claude Code's Task tool to parallelize:
-
-```
-Launch 3 research agents in parallel:
-1. Agent 1: Research sub-questions 1-2
-2. Agent 2: Research sub-questions 3-4
-3. Agent 3: Research sub-question 5 + cross-cutting themes
-```
-
-Each agent searches, reads sources, and returns findings. The main session synthesizes into the final report.
+For broad topics, parallelize with subagents — see `references/parallel-research.md`.
 
 ## Quality Rules
 
@@ -198,8 +99,14 @@ Each agent searches, reads sources, and returns findings. The main session synth
 2. **Cross-reference.** If only one source says it, flag it as unverified.
 3. **Recency matters.** Prefer sources from the last 12 months.
 4. **Acknowledge gaps.** If you couldn't find good info on a sub-question, say so.
-5. **No hallucination.** If you don't know, say "insufficient data found."
-6. **Separate fact from inference.** Label estimates, projections, and opinions clearly.
+5. **No hallucination.** "Insufficient data found" beats a confident wrong answer.
+6. **Separate fact from inference.** Label estimates, projections, opinions clearly.
+
+## Reference Index
+
+- `references/workflow.md` — full 6-step workflow, search strategy, deep-read tools.
+- `references/report-template.md` — report structure with executive summary, themes, sources.
+- `references/parallel-research.md` — using subagents for broad topics.
 
 ## Examples
 

@@ -1,0 +1,123 @@
+{
+  "$schema": "./trigger-fixtures.schema.json",
+  "description": "Sample prompts mapped to expected primary skill activation. Used by scripts/test-trigger-routing.ps1 to verify dispatcher behavior empirically. Add new entries as you encounter routing failures. routing_difficulty:'hard' marks fixtures that the keyword scorer is expected to fail — they need real LLM semantic matching to route correctly. The script reports them but does not count them as test failures.",
+  "version": "1.1.0",
+  "fixtures": [
+    {
+      "prompt": "Design a paginated REST endpoint for listing user orders.",
+      "expected_primary": "api-design",
+      "expected_companion": ["security-review", "tdd-workflow"],
+      "should_not_activate": ["ui-ux-pro-max", "frontend-patterns"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "We have an N+1 query issue in our markets service. How do we fix it?",
+      "expected_primary": "backend-patterns",
+      "expected_companion": [],
+      "should_not_activate": ["frontend-patterns", "ui-ux-pro-max"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Onboard me to this Next.js codebase — generate a CLAUDE.md.",
+      "expected_primary": "codebase-onboarding",
+      "expected_companion": ["repo-scan"],
+      "should_not_activate": ["deep-research"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Research the current state of WebGPU adoption in production browsers.",
+      "expected_primary": "deep-research",
+      "expected_companion": ["documentation-lookup"],
+      "should_not_activate": ["codebase-onboarding"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "How do I configure middleware in Next.js 15?",
+      "expected_primary": "documentation-lookup",
+      "expected_companion": [],
+      "should_not_activate": ["frontend-patterns"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Write a Playwright E2E test for the checkout flow with retries.",
+      "expected_primary": "e2e-testing",
+      "expected_companion": ["verification-loop"],
+      "should_not_activate": ["tdd-workflow"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Refactor this React component to use a custom hook for the search debounce.",
+      "expected_primary": "frontend-patterns",
+      "expected_companion": ["ui-ux-pro-max"],
+      "should_not_activate": ["backend-patterns"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Should I rebase or merge my feature branch into main?",
+      "expected_primary": "git-workflow",
+      "expected_companion": [],
+      "should_not_activate": ["api-design", "backend-patterns"],
+      "routing_difficulty": "hard",
+      "difficulty_reason": "'rebase or merge' has 67% token overlap with 'merge vs rebase' — below the 75% partial-match threshold. Real LLM dispatchers handle this paraphrase semantically."
+    },
+    {
+      "prompt": "Build an MCP server with a search tool that uses stdio transport.",
+      "expected_primary": "mcp-server-patterns",
+      "expected_companion": ["documentation-lookup", "security-review"],
+      "should_not_activate": ["frontend-patterns"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Audit this 50K-file legacy C++ monorepo for vendored dependencies and dead code.",
+      "expected_primary": "repo-scan",
+      "expected_companion": ["codebase-onboarding"],
+      "should_not_activate": ["deep-research"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Review this auth flow before we ship — JWT in cookies, RLS enabled.",
+      "expected_primary": "security-review",
+      "expected_companion": ["api-design", "backend-patterns"],
+      "should_not_activate": ["ui-ux-pro-max"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Write a failing test for the off-by-one bug in the pagination cursor.",
+      "expected_primary": "tdd-workflow",
+      "expected_companion": ["verification-loop"],
+      "should_not_activate": ["ui-ux-pro-max"],
+      "routing_difficulty": "hard",
+      "difficulty_reason": "Genuine signal conflict — prompt contains both 'pagination' (api-design primary_when, weight 3) and 'failing test' (tdd-workflow trigger, weight 2). LLM dispatcher must weight the action verb 'Write a failing test' higher than the noun 'pagination'. Keyword scorer cannot."
+    },
+    {
+      "prompt": "Design the color palette and typography for a fintech dashboard with dark mode.",
+      "expected_primary": "ui-ux-pro-max",
+      "expected_companion": ["frontend-patterns"],
+      "should_not_activate": ["backend-patterns", "api-design"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "I'm done with the feature — verify build, types, lint, tests before I open a PR.",
+      "expected_primary": "verification-loop",
+      "expected_companion": ["tdd-workflow"],
+      "should_not_activate": ["api-design"],
+      "routing_difficulty": "easy"
+    },
+    {
+      "prompt": "Add Solana wallet signature verification to the payment endpoint.",
+      "expected_primary": "security-review",
+      "expected_companion": ["api-design", "backend-patterns"],
+      "should_not_activate": ["frontend-patterns"],
+      "routing_difficulty": "hard",
+      "difficulty_reason": "'payment endpoint' shares only 'payment' with the keyword 'payment feature' — neither token alone is in the keyword set. 'Solana' / 'wallet' / 'signature' are domain-specific and not generalizable to security-review's keyword surface. LLM dispatcher routes via semantic understanding of 'wallet signature verification' as a security concern."
+    },
+    {
+      "prompt": "The login button hover state doesn't show on iOS Safari — how do we fix this on a touch-only device?",
+      "expected_primary": "ui-ux-pro-max",
+      "expected_companion": ["frontend-patterns"],
+      "should_not_activate": ["backend-patterns"],
+      "routing_difficulty": "hard",
+      "difficulty_reason": "'hover', 'touch-only', 'iOS Safari' are all UX concepts but none appear in ui-ux-pro-max's keyword set as standalone terms. Could be fixed by adding 'hover' / 'touch' to triggers.positive, but risks false positives on backend prompts mentioning 'touch a file'. LLM dispatcher resolves via semantic UX context."
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-skills-windows:
+    name: Validate skills (Windows / strict)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run validate-skills.ps1 -Strict
+        shell: pwsh
+        run: |
+          .\scripts\validate-skills.ps1 -Strict
+
+  install-dryrun-windows:
+    name: Install dry-run (Windows)
+    runs-on: windows-latest
+    needs: validate-skills-windows
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create empty target project
+        shell: pwsh
+        run: |
+          $target = Join-Path $env:RUNNER_TEMP "target-project"
+          New-Item -ItemType Directory -Force -Path $target | Out-Null
+          "$target" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "TARGET=$target"
+          Add-Content -Path $env:GITHUB_ENV -Value "TARGET=$target"
+      - name: Run installer in dry-run mode
+        shell: pwsh
+        run: |
+          .\scripts\install-to-project.ps1 -ProjectPath $env:TARGET -DryRun
+
+  install-dryrun-posix:
+    name: Install dry-run (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make installer executable
+        run: chmod +x scripts/install-to-project.sh
+      - name: Create empty target project
+        run: |
+          target="$RUNNER_TEMP/target-project"
+          mkdir -p "$target"
+          echo "TARGET=$target" >> "$GITHUB_ENV"
+      - name: Run installer in dry-run mode
+        run: ./scripts/install-to-project.sh --project "$TARGET" --dry-run
+
+  install-apply-posix:
+    name: Install apply (${{ matrix.os }}) — verify resulting structure
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    needs: install-dryrun-posix
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make installer executable
+        run: chmod +x scripts/install-to-project.sh
+      - name: Create empty target project and install
+        run: |
+          target="$RUNNER_TEMP/target-project"
+          mkdir -p "$target"
+          ./scripts/install-to-project.sh --project "$target" --yes
+      - name: Verify expected files exist
+        run: |
+          target="$RUNNER_TEMP/target-project"
+          test -d "$target/.agents/skills"           || { echo "missing .agents/skills"; exit 1; }
+          test -f "$target/.agents/skills/manifest.json" || { echo "missing manifest"; exit 1; }
+          test -L "$target/.claude/skills"           || { echo ".claude/skills should be a symlink"; exit 1; }
+          test -L "$target/.codex/skills"            || { echo ".codex/skills should be a symlink"; exit 1; }
+          test -f "$target/AGENTS.md"                || { echo "missing AGENTS.md"; exit 1; }
+          test -f "$target/CLAUDE.md"                || { echo "missing CLAUDE.md"; exit 1; }
+          test -f "$target/.agents/AGENTS.md"        || { echo "missing .agents/AGENTS.md"; exit 1; }
+          test -d "$target/.agents/rules"            || { echo "missing .agents/rules"; exit 1; }
+          test -d "$target/.agents/roles"            || { echo "missing .agents/roles"; exit 1; }
+          # Symlink target check
+          link_target="$(readlink "$target/.claude/skills")"
+          [[ "$link_target" == "$target/.agents/skills" ]] || { echo "wrong symlink target: $link_target"; exit 1; }
+          echo "Install verification passed."
+
+  install-safety-posix:
+    name: Install safety (${{ matrix.os }}) — refuse to overwrite without --force-links
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    needs: install-dryrun-posix
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make installer executable
+        run: chmod +x scripts/install-to-project.sh
+      - name: Create target with pre-existing real .claude/skills directory
+        run: |
+          target="$RUNNER_TEMP/target-existing"
+          mkdir -p "$target/.claude/skills/my-custom-skill"
+          echo "user content" > "$target/.claude/skills/my-custom-skill/SKILL.md"
+          echo "TARGET=$target" >> "$GITHUB_ENV"
+      - name: Installer should refuse without --force-links (expect failure)
+        run: |
+          if ./scripts/install-to-project.sh --project "$TARGET" --yes; then
+            echo "FAIL: installer should have refused to overwrite real directory"
+            exit 1
+          fi
+          # Verify user content was NOT touched
+          test -f "$TARGET/.claude/skills/my-custom-skill/SKILL.md" || { echo "user content was destroyed!"; exit 1; }
+          echo "Safety check passed: installer refused, user content intact."
+      - name: Installer with --force-links should backup user content
+        run: |
+          ./scripts/install-to-project.sh --project "$TARGET" --force-links --yes
+          # Verify backup exists
+          backup_count="$(find "$TARGET/.agents/.backups" -name 'SKILL.md' -path '*my-custom-skill*' 2>/dev/null | wc -l)"
+          if [[ "$backup_count" -lt 1 ]]; then
+            echo "FAIL: user content was not backed up"
+            find "$TARGET/.agents/.backups" -type f 2>/dev/null || true
+            exit 1
+          fi
+          echo "Safety check passed: user content backed up before overwrite."

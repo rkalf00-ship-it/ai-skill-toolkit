@@ -1,10 +1,57 @@
+<#
+.SYNOPSIS
+  Install AI Skill Toolkit into a target project (Windows / PowerShell).
+
+.DESCRIPTION
+  Copies the curated skills into <ProjectPath>\.agents\skills (the single source
+  of truth) and creates directory junctions at .claude\skills and .codex\skills
+  pointing to the same source. Also installs .agents\{rules,roles,commands,
+  plugins} and policy files (AGENTS.md, CLAUDE.md, .agents\AGENTS.md).
+
+.PARAMETER ProjectPath
+  Required. Target project root.
+
+.PARAMETER ForcePolicy
+  Overwrite existing AGENTS.md / CLAUDE.md / .agents\AGENTS.md (default: skip).
+
+.PARAMETER ForceLinks
+  Replace a non-empty real .claude\skills or .codex\skills directory with a
+  junction. The previous content is moved to a timestamped backup directory
+  (unless -NoBackup is also passed, in which case the install aborts and tells
+  you what would be lost).
+
+.PARAMETER DryRun
+  Print every action without making changes. Validates inputs, lists skills,
+  reports what would be copied / overwritten / backed up. Exits 0 on success.
+
+.PARAMETER NoBackup
+  Suppress automatic backup of overwritten directories. Combined with
+  -ForceLinks this becomes destructive; the script will require an interactive
+  yes/no confirmation unless -Yes is also passed.
+
+.PARAMETER Yes
+  Skip interactive confirmation prompts (for CI / scripted use).
+
+.EXAMPLE
+  .\scripts\install-to-project.ps1 -ProjectPath D:\my-app
+  .\scripts\install-to-project.ps1 -ProjectPath D:\my-app -DryRun
+  .\scripts\install-to-project.ps1 -ProjectPath D:\my-app -ForceLinks
+  .\scripts\install-to-project.ps1 -ProjectPath D:\my-app -ForceLinks -NoBackup -Yes
+#>
+[CmdletBinding()]
 param(
   [Parameter(Mandatory=$true)]
   [string]$ProjectPath,
 
   [switch]$ForcePolicy,
 
-  [switch]$ForceLinks
+  [switch]$ForceLinks,
+
+  [switch]$DryRun,
+
+  [switch]$NoBackup,
+
+  [switch]$Yes
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,11 +60,13 @@ $SkillRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path
 $CuratedSkillPath = Join-Path $SkillRoot "skills"
 $ManifestPath = Join-Path $CuratedSkillPath "manifest.json"
 $AgentsSourcePath = Join-Path $SkillRoot ".agents"
+
+if (-not (Test-Path -LiteralPath $ProjectPath)) {
+  throw "ProjectPath does not exist: $ProjectPath"
+}
 $TargetProject = (Resolve-Path -LiteralPath $ProjectPath).Path
 
 # Skills that ship asset directories beyond SKILL.md.
-# Each listed entry MUST be a non-empty directory. A plain file at the path
-# (e.g. a tokenized path stub left by a broken symlink checkout) is rejected.
 $RequiredAssets = @{
   "ui-ux-pro-max" = @("data", "scripts", "templates")
 }
@@ -25,11 +74,9 @@ $RequiredAssets = @{
 if (-not (Test-Path -LiteralPath $CuratedSkillPath)) {
   throw "Curated skills folder not found: $CuratedSkillPath"
 }
-
 if (-not (Test-Path -LiteralPath $ManifestPath)) {
   throw "Skill manifest not found: $ManifestPath"
 }
-
 if (-not (Test-Path -LiteralPath $AgentsSourcePath)) {
   throw "Toolkit .agents folder not found: $AgentsSourcePath"
 }
@@ -37,13 +84,43 @@ if (-not (Test-Path -LiteralPath $AgentsSourcePath)) {
 $Manifest = Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json
 $ExpectedSkills = @($Manifest.skills | ForEach-Object { $_.id })
 
+# --------------------------------------------------------------------
+# Helpers
+# --------------------------------------------------------------------
+$Timestamp = (Get-Date -Format 'yyyyMMdd-HHmmss')
+$BackupRoot = Join-Path $TargetProject ".agents\.backups\$Timestamp"
+
+function Write-Action {
+  param([string]$Verb, [string]$Detail)
+  $prefix = if ($DryRun) { "[DRY-RUN]" } else { "[      ]" }
+  Write-Host "$prefix $Verb`: $Detail"
+}
+
+function Confirm-Destructive {
+  param([string]$Question)
+  if ($Yes) { return $true }
+  $resp = Read-Host "$Question [y/N]"
+  return ($resp -eq 'y' -or $resp -eq 'Y' -or $resp -eq 'yes')
+}
+
+function Backup-Directory {
+  param([string]$Source)
+  if (-not (Test-Path -LiteralPath $Source)) { return $null }
+  $rel = $Source.Substring($TargetProject.Length).TrimStart('\','/')
+  $dest = Join-Path $BackupRoot $rel
+  $destParent = Split-Path -Parent $dest
+  Write-Action "BACKUP" "$Source -> $dest"
+  if (-not $DryRun) {
+    New-Item -ItemType Directory -Force -Path $destParent | Out-Null
+    Copy-Item -LiteralPath $Source -Destination $dest -Recurse -Force
+  }
+  return $dest
+}
+
 function Copy-ToolkitDirectory {
   param(
-    [Parameter(Mandatory=$true)]
-    [string]$Source,
-
-    [Parameter(Mandatory=$true)]
-    [string]$Destination
+    [Parameter(Mandatory=$true)] [string]$Source,
+    [Parameter(Mandatory=$true)] [string]$Destination
   )
 
   $ExcludedDirectoryNames = @('__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'node_modules')
@@ -51,10 +128,21 @@ function Copy-ToolkitDirectory {
   $ExcludedFileExtensions = @('.pyc', '.pyo')
 
   if (Test-Path -LiteralPath $Destination) {
-    Remove-Item -LiteralPath $Destination -Recurse -Force
+    Write-Action "REMOVE" $Destination
+    if (-not $DryRun) {
+      Remove-Item -LiteralPath $Destination -Recurse -Force
+    }
   }
 
-  New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+  Write-Action "MKDIR" $Destination
+  if (-not $DryRun) {
+    New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+  }
+
+  if ($DryRun) {
+    Write-Action "COPY-TREE" "$Source -> $Destination (skipped in dry-run)"
+    return
+  }
 
   foreach ($Item in (Get-ChildItem -LiteralPath $Source -Recurse -Force)) {
     $relativePath = $Item.FullName.Substring($Source.Length).TrimStart('\','/')
@@ -81,6 +169,9 @@ function Copy-ToolkitDirectory {
   }
 }
 
+# --------------------------------------------------------------------
+# Pre-flight: validate skill assets, plan junctions
+# --------------------------------------------------------------------
 $Skills = @()
 foreach ($SkillSpec in @($Manifest.skills)) {
   $SkillName = $SkillSpec.id
@@ -128,113 +219,170 @@ $JunctionSkillDestinations = @(
   (Join-Path $TargetProject ".codex\skills")
 )
 
-Write-Host "Skill root: $SkillRoot"
-Write-Host "Target project: $TargetProject"
-Write-Host "Curated skills: $($Skills.Count)"
+# Pre-flight junction safety: detect non-junction directories that would be replaced
+$ReparseFlag = [IO.FileAttributes]::ReparsePoint
+$JunctionConflicts = @()
+foreach ($JunctionPath in $JunctionSkillDestinations) {
+  if (Test-Path -LiteralPath $JunctionPath) {
+    $ExistingItem = Get-Item -LiteralPath $JunctionPath -Force
+    $IsReparse = ($ExistingItem.Attributes -band $ReparseFlag) -eq $ReparseFlag
+    if (-not $IsReparse) {
+      $HasContent = @(Get-ChildItem -LiteralPath $JunctionPath -Force -ErrorAction SilentlyContinue).Count -gt 0
+      if ($HasContent) {
+        $JunctionConflicts += $JunctionPath
+      }
+    }
+  }
+}
 
-# Single source of truth: copy skills only into .agents/skills
-New-Item -ItemType Directory -Force -Path $PrimarySkillDestination | Out-Null
+if ($JunctionConflicts.Count -gt 0) {
+  Write-Host ""
+  Write-Host "WARNING: The following real directories contain content and will be replaced by a junction:" -ForegroundColor Yellow
+  foreach ($p in $JunctionConflicts) { Write-Host "  - $p" -ForegroundColor Yellow }
+
+  if (-not $ForceLinks) {
+    throw "Refusing to overwrite. Pass -ForceLinks to proceed (content will be backed up to $BackupRoot unless -NoBackup is given)."
+  }
+
+  if ($NoBackup) {
+    Write-Host "  -NoBackup is set: existing content will be PERMANENTLY DELETED." -ForegroundColor Red
+    if (-not $DryRun -and -not (Confirm-Destructive "Proceed with destructive overwrite?")) {
+      Write-Host "Aborted by user."
+      exit 2
+    }
+  } else {
+    Write-Host "  Existing content will be backed up to: $BackupRoot" -ForegroundColor Cyan
+  }
+}
+
+Write-Host ""
+Write-Host "Skill root:      $SkillRoot"
+Write-Host "Target project:  $TargetProject"
+Write-Host "Curated skills:  $($Skills.Count)"
+Write-Host "Backup root:     $(if ($NoBackup) { '(disabled)' } else { $BackupRoot })"
+Write-Host "Mode:            $(if ($DryRun) { 'DRY RUN (no changes)' } else { 'APPLY' })"
+Write-Host ""
+
+# --------------------------------------------------------------------
+# Apply: copy skills (single source of truth)
+# --------------------------------------------------------------------
+Write-Action "MKDIR" $PrimarySkillDestination
+if (-not $DryRun) {
+  New-Item -ItemType Directory -Force -Path $PrimarySkillDestination | Out-Null
+}
+
+# Backup primary skills directory if it already exists with content
+if ((Test-Path -LiteralPath $PrimarySkillDestination) -and -not $NoBackup -and -not $DryRun) {
+  $existingCount = @(Get-ChildItem -LiteralPath $PrimarySkillDestination -Force -ErrorAction SilentlyContinue).Count
+  if ($existingCount -gt 0) {
+    Backup-Directory -Source $PrimarySkillDestination | Out-Null
+  }
+}
+
 foreach ($Skill in $Skills) {
   Copy-ToolkitDirectory -Source $Skill.FullName -Destination (Join-Path $PrimarySkillDestination $Skill.Name)
 }
-Copy-Item -LiteralPath $ManifestPath -Destination $PrimarySkillDestination -Force
-Write-Host "Installed skills to: $PrimarySkillDestination"
 
-# .claude/skills and .codex/skills are directory junctions to .agents/skills
-$ReparseFlag = [IO.FileAttributes]::ReparsePoint
+Write-Action "COPY" "$ManifestPath -> $PrimarySkillDestination"
+if (-not $DryRun) {
+  Copy-Item -LiteralPath $ManifestPath -Destination $PrimarySkillDestination -Force
+}
+
+# --------------------------------------------------------------------
+# Apply: junctions for .claude/skills and .codex/skills
+# --------------------------------------------------------------------
 foreach ($JunctionPath in $JunctionSkillDestinations) {
   $JunctionParent = Split-Path -Parent $JunctionPath
-  New-Item -ItemType Directory -Force -Path $JunctionParent | Out-Null
+  if (-not $DryRun) {
+    New-Item -ItemType Directory -Force -Path $JunctionParent | Out-Null
+  }
 
   if (Test-Path -LiteralPath $JunctionPath) {
     $ExistingItem = Get-Item -LiteralPath $JunctionPath -Force
     $IsReparse = ($ExistingItem.Attributes -band $ReparseFlag) -eq $ReparseFlag
 
     if ($IsReparse) {
-      # Existing junction/symlink - replace unconditionally so the target is correct
-      [System.IO.Directory]::Delete($JunctionPath)
-    } else {
-      $HasContent = @(Get-ChildItem -LiteralPath $JunctionPath -Force -ErrorAction SilentlyContinue).Count -gt 0
-      if ($HasContent -and -not $ForceLinks) {
-        throw "Cannot create junction at ${JunctionPath}: real directory exists with content. Remove it manually or pass -ForceLinks to overwrite."
+      Write-Action "UNLINK" "$JunctionPath (existing junction)"
+      if (-not $DryRun) {
+        [System.IO.Directory]::Delete($JunctionPath)
       }
-      Remove-Item -LiteralPath $JunctionPath -Recurse -Force
+    } else {
+      # Real directory with content: must be in $JunctionConflicts (already gated above)
+      if (-not $NoBackup) {
+        Backup-Directory -Source $JunctionPath | Out-Null
+      }
+      Write-Action "REMOVE" "$JunctionPath (real directory replaced)"
+      if (-not $DryRun) {
+        Remove-Item -LiteralPath $JunctionPath -Recurse -Force
+      }
     }
   }
 
-  New-Item -ItemType Junction -Path $JunctionPath -Target $PrimarySkillDestination | Out-Null
-  Write-Host "Linked junction: $JunctionPath -> $PrimarySkillDestination"
+  Write-Action "JUNCTION" "$JunctionPath -> $PrimarySkillDestination"
+  if (-not $DryRun) {
+    New-Item -ItemType Junction -Path $JunctionPath -Target $PrimarySkillDestination | Out-Null
+  }
 }
 
-$AgentsRulesSource = Join-Path $AgentsSourcePath "rules"
-$AgentsRolesSource = Join-Path $AgentsSourcePath "roles"
+# --------------------------------------------------------------------
+# Apply: .agents/{rules,roles,commands,plugins} and plugins/
+# --------------------------------------------------------------------
+$AgentsRulesSource    = Join-Path $AgentsSourcePath "rules"
+$AgentsRolesSource    = Join-Path $AgentsSourcePath "roles"
 $AgentsCommandsSource = Join-Path $AgentsSourcePath "commands"
-$AgentsPluginsSource = Join-Path $AgentsSourcePath "plugins"
-$AgentsAgentsSource = Join-Path $AgentsSourcePath "AGENTS.md"
-$PluginsSource = Join-Path $SkillRoot "plugins"
+$AgentsPluginsSource  = Join-Path $AgentsSourcePath "plugins"
+$AgentsAgentsSource   = Join-Path $AgentsSourcePath "AGENTS.md"
+$PluginsSource        = Join-Path $SkillRoot "plugins"
 
-$AgentsRulesTarget = Join-Path $TargetProject ".agents\rules"
-$AgentsRolesTarget = Join-Path $TargetProject ".agents\roles"
+$AgentsRulesTarget    = Join-Path $TargetProject ".agents\rules"
+$AgentsRolesTarget    = Join-Path $TargetProject ".agents\roles"
 $AgentsCommandsTarget = Join-Path $TargetProject ".agents\commands"
-$AgentsPluginsTarget = Join-Path $TargetProject ".agents\plugins"
-$AgentsAgentsTarget = Join-Path $TargetProject ".agents\AGENTS.md"
-$PluginsTarget = Join-Path $TargetProject "plugins"
+$AgentsPluginsTarget  = Join-Path $TargetProject ".agents\plugins"
+$AgentsAgentsTarget   = Join-Path $TargetProject ".agents\AGENTS.md"
+$PluginsTarget        = Join-Path $TargetProject "plugins"
 
-New-Item -ItemType Directory -Force -Path $AgentsRulesTarget | Out-Null
-New-Item -ItemType Directory -Force -Path $AgentsRolesTarget | Out-Null
-New-Item -ItemType Directory -Force -Path $AgentsCommandsTarget | Out-Null
-New-Item -ItemType Directory -Force -Path $AgentsPluginsTarget | Out-Null
-
-if (Test-Path -LiteralPath $AgentsRulesSource) {
-  Get-ChildItem -LiteralPath $AgentsRulesSource | ForEach-Object {
-    Copy-Item -LiteralPath $_.FullName -Destination $AgentsRulesTarget -Recurse -Force
-  }
-  Write-Host "Installed multi-role rules to: $AgentsRulesTarget"
-} else {
-  Write-Host "Skipped missing source: $AgentsRulesSource"
+foreach ($t in @($AgentsRulesTarget, $AgentsRolesTarget, $AgentsCommandsTarget, $AgentsPluginsTarget)) {
+  Write-Action "MKDIR" $t
+  if (-not $DryRun) { New-Item -ItemType Directory -Force -Path $t | Out-Null }
 }
 
-if (Test-Path -LiteralPath $AgentsRolesSource) {
-  Get-ChildItem -LiteralPath $AgentsRolesSource | ForEach-Object {
-    Copy-Item -LiteralPath $_.FullName -Destination $AgentsRolesTarget -Recurse -Force
+function Install-AgentsSubtree {
+  param([string]$Source, [string]$Target, [string]$Label)
+  if (-not (Test-Path -LiteralPath $Source)) {
+    Write-Host "Skipped missing source: $Source"
+    return
   }
-  Write-Host "Installed multi-role roles to: $AgentsRolesTarget"
-} else {
-  Write-Host "Skipped missing source: $AgentsRolesSource"
+  Write-Action "INSTALL-$Label" "$Source -> $Target"
+  if (-not $DryRun) {
+    Get-ChildItem -LiteralPath $Source | ForEach-Object {
+      Copy-Item -LiteralPath $_.FullName -Destination $Target -Recurse -Force
+    }
+  }
 }
 
-if (Test-Path -LiteralPath $AgentsCommandsSource) {
-  Get-ChildItem -LiteralPath $AgentsCommandsSource | ForEach-Object {
-    Copy-Item -LiteralPath $_.FullName -Destination $AgentsCommandsTarget -Recurse -Force
-  }
-  Write-Host "Installed commands to: $AgentsCommandsTarget"
-} else {
-  Write-Host "Skipped missing source: $AgentsCommandsSource"
-}
-
-if (Test-Path -LiteralPath $AgentsPluginsSource) {
-  Get-ChildItem -LiteralPath $AgentsPluginsSource | ForEach-Object {
-    Copy-Item -LiteralPath $_.FullName -Destination $AgentsPluginsTarget -Recurse -Force
-  }
-  Write-Host "Installed plugin marketplace to: $AgentsPluginsTarget"
-} else {
-  Write-Host "Skipped missing source: $AgentsPluginsSource"
-}
+Install-AgentsSubtree -Source $AgentsRulesSource    -Target $AgentsRulesTarget    -Label "RULES"
+Install-AgentsSubtree -Source $AgentsRolesSource    -Target $AgentsRolesTarget    -Label "ROLES"
+Install-AgentsSubtree -Source $AgentsCommandsSource -Target $AgentsCommandsTarget -Label "COMMANDS"
+Install-AgentsSubtree -Source $AgentsPluginsSource  -Target $AgentsPluginsTarget  -Label "PLUGINS-MARKETPLACE"
 
 if (Test-Path -LiteralPath $PluginsSource) {
-  New-Item -ItemType Directory -Force -Path $PluginsTarget | Out-Null
+  Write-Action "MKDIR" $PluginsTarget
+  if (-not $DryRun) { New-Item -ItemType Directory -Force -Path $PluginsTarget | Out-Null }
   Get-ChildItem -LiteralPath $PluginsSource | ForEach-Object {
     if ($_.PSIsContainer) {
       Copy-ToolkitDirectory -Source $_.FullName -Destination (Join-Path $PluginsTarget $_.Name)
     } else {
-      Copy-Item -LiteralPath $_.FullName -Destination $PluginsTarget -Force
+      Write-Action "COPY" "$($_.FullName) -> $PluginsTarget"
+      if (-not $DryRun) { Copy-Item -LiteralPath $_.FullName -Destination $PluginsTarget -Force }
     }
   }
-  Write-Host "Installed plugins to: $PluginsTarget"
 } else {
   Write-Host "Skipped missing source: $PluginsSource"
 }
 
+# --------------------------------------------------------------------
+# Apply: policy files (with backup-on-overwrite)
+# --------------------------------------------------------------------
 $PolicyFiles = @(
   @{ Source = (Join-Path $SkillRoot "AGENTS.md"); Target = (Join-Path $TargetProject "AGENTS.md") },
   @{ Source = (Join-Path $SkillRoot "CLAUDE.md"); Target = (Join-Path $TargetProject "CLAUDE.md") },
@@ -247,12 +395,33 @@ foreach ($Policy in $PolicyFiles) {
     continue
   }
 
-  if ($ForcePolicy -or -not (Test-Path -LiteralPath $Policy.Target)) {
-    Copy-Item -LiteralPath $Policy.Source -Destination $Policy.Target -Force
-    Write-Host "Wrote policy: $($Policy.Target)"
-  } else {
+  $exists = Test-Path -LiteralPath $Policy.Target
+  if ($exists -and -not $ForcePolicy) {
     Write-Host "Skipped existing policy: $($Policy.Target) (pass -ForcePolicy to overwrite)"
+    continue
+  }
+
+  if ($exists -and $ForcePolicy -and -not $NoBackup -and -not $DryRun) {
+    $rel = $Policy.Target.Substring($TargetProject.Length).TrimStart('\','/')
+    $bk = Join-Path $BackupRoot $rel
+    $bkParent = Split-Path -Parent $bk
+    Write-Action "BACKUP" "$($Policy.Target) -> $bk"
+    New-Item -ItemType Directory -Force -Path $bkParent | Out-Null
+    Copy-Item -LiteralPath $Policy.Target -Destination $bk -Force
+  }
+
+  Write-Action "WRITE-POLICY" $Policy.Target
+  if (-not $DryRun) {
+    Copy-Item -LiteralPath $Policy.Source -Destination $Policy.Target -Force
   }
 }
 
-Write-Host "Done. Curated skills and multi-role system installed."
+Write-Host ""
+if ($DryRun) {
+  Write-Host "Dry run complete. No changes were made." -ForegroundColor Cyan
+} else {
+  Write-Host "Done. Curated skills and multi-role system installed." -ForegroundColor Green
+  if (-not $NoBackup -and (Test-Path -LiteralPath $BackupRoot)) {
+    Write-Host "Backups (if any) saved under: $BackupRoot" -ForegroundColor Cyan
+  }
+}
